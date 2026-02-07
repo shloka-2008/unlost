@@ -78,13 +78,11 @@ def home():
     latest_items = list(mongo.db.items.find({"status": {"$ne": "Archived"}}).sort("date", -1).limit(10))
     return render_template('home.html', latest_items=latest_items)
 
-@app.route('/items')
-@login_required
-def items():
-    query = request.args.get('q')
-    category_filter = request.args.get('category')
-    status_filter = request.args.get('status')
-    date_filter = request.args.get('date')
+def build_items_filter(args):
+    query = args.get('q')
+    category_filter = args.get('category')
+    status_filter = args.get('status')
+    date_filter = args.get('date')
 
     filter_criteria = {}
 
@@ -92,10 +90,10 @@ def items():
         # Simple regex search for query in title or description
         regex = {"$regex": query, "$options": "i"}
         filter_criteria["$or"] = [{"title": regex}, {"description": regex}]
-    
+
     if category_filter:
         filter_criteria["category"] = category_filter
-        
+
     if status_filter:
         filter_criteria["status"] = status_filter
 
@@ -104,39 +102,36 @@ def items():
             start_of_day = datetime.strptime(date_filter, '%Y-%m-%d')
             from datetime import timedelta
             end_of_day = start_of_day + timedelta(days=1)
-            
+
             filter_criteria["date"] = {
                 "$gte": start_of_day,
                 "$lt": end_of_day
             }
         except ValueError:
-            pass # Ignore invalid date format
+            pass  # Ignore invalid date format
 
-    # Order by newest first
-    # Sort by 'date' descending (-1)
-    # Exclude archived items
-    if "status" not in filter_criteria:
-         filter_criteria["status"] = {"$ne": "Archived"}
-    elif filter_criteria["status"] == "Archived":
-        # If explicitly asking for Archived (future proofing), let it pass, 
-        # but if status is something else, make sure we don't accidentally show archived if logic was complex.
-        # For now, simplest is:
-        pass 
-    elif "$ne" not in filter_criteria.get("status", {}):
-         # If filter is specific status (e.g. Lost), it won't be Archived anyway.
-         # But if it's a general query, we must ensure != Archived.
-         # Actually, simpler logic:
-         pass
-
-    # Re-apply strict filter if no status filter or status filter is not 'Archived' (if we ever allow that)
-    # The user request is to "exclude archived items", usually implying from the main list.
+    # Exclude archived items unless explicitly requested
     if not status_filter:
         filter_criteria["status"] = {"$ne": "Archived"}
 
+    return filter_criteria
+
+@app.route('/items')
+@login_required
+def items():
+    filter_criteria = build_items_filter(request.args)
     items_cursor = mongo.db.items.find(filter_criteria).sort("date", -1)
     items = list(items_cursor)
-    
+
     return render_template('items.html', items=items)
+
+@app.route('/items/partial')
+@login_required
+def items_partial():
+    filter_criteria = build_items_filter(request.args)
+    items = list(mongo.db.items.find(filter_criteria).sort("date", -1))
+
+    return render_template('partials/items_list.html', items=items)
 
 @app.route('/report', methods=['GET', 'POST'])
 @login_required
@@ -345,21 +340,33 @@ def admin():
     if not current_user.is_admin:
         flash('Access denied: Admin privileges required.', 'danger')
         return redirect(url_for('home'))
-        
+
     total_items = mongo.db.items.count_documents({"status": {"$ne": "Archived"}})
     total_users = mongo.db.users.count_documents({})
-    
+    archived_items = mongo.db.items.count_documents({"status": "Archived"})
+
+    # Items reported today (UTC)
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    new_today = mongo.db.items.count_documents({
+        "date": {"$gte": today_start},
+        "status": {"$ne": "Archived"}
+    })
+
     # Fetch recent items (limit changed from 5 to 10 for Overview)
     recent_items = list(mongo.db.items.find({"status": {"$ne": "Archived"}}).sort("date", -1).limit(10))
-    
+
     # Fetch archived items for recovery (Trash)
     trash_items = list(mongo.db.items.find({"status": "Archived"}).sort("deleted_at", -1))
-    
+
     logs = list(mongo.db.logs.find().sort("timestamp", -1).limit(20))
-    
-    return render_template('admin.html', 
-                         total_items=total_items, 
-                         total_users=total_users, 
+    security_alerts = mongo.db.logs.count_documents({"action": {"$regex": "Security Alert"}})
+
+    return render_template('admin.html',
+                         total_items=total_items,
+                         total_users=total_users,
+                         archived_items=archived_items,
+                         new_today=new_today,
+                         security_alerts=security_alerts,
                          recent_items=recent_items,
                          trash_items=trash_items,
                          logs=logs,

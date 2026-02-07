@@ -4,125 +4,201 @@
 <div class="container container-medium">
     <h1 class="page-title">Report an Item</h1>
 
-    <div class="card">
-        <div class="card-body">
-            <form action="{{ url_for('report') }}" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="title">Item Title</label>
-                    <input type="text" id="title" name="title" required placeholder="e.g. Blue Jansport Backpack">
-                </div>
+    <div class="report-progress">
+        <div class="progress-step active" data-step="1">1. Details</div>
+        <div class="progress-step" data-step="2">2. Contact</div>
+        <div class="progress-step" data-step="3">3. Security</div>
+    </div>
 
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status" name="status" required onchange="toggleSecuritySection(this.value)">
-                        <option value="Lost">Lost - I lost something</option>
-                        <option value="Found">Found - I found something</option>
-                    </select>
-                </div>
-
-                <div id="security-section"
-                    style="display: none; background-color: #f0f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #bae6fd;">
-                    <h3 style="margin-top: 0; font-size: 1.2rem; color: #0284c7; margin-bottom: 0.5rem;">
-                        <i class="fa-solid fa-shield-halved"></i> Smart Claim Protection
-                    </h3>
-                    <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #334155;">
-                        Prevent false claims by setting a security question that only the true owner would know answer
-                        to.
-                    </p>
+    <form id="report-form" action="{{ url_for('report') }}" method="POST" enctype="multipart/form-data" novalidate>
+        <div class="report-step active" data-step="1">
+            <div class="card">
+                <div class="card-body">
                     <div class="form-group">
-                        <label for="security_question">Security Question</label>
-                        <input type="text" id="security_question" name="security_question"
-                            placeholder="e.g. What is the wallpaper image on the lock screen?">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" name="title" placeholder="e.g. Black Wallet" required>
+                        <small class="form-hint">Keep it short and clear.</small>
                     </div>
+
                     <div class="form-group">
-                        <label for="security_answer">Answer</label>
-                        <input type="text" id="security_answer" name="security_answer"
-                            placeholder="e.g. A photo of a golden retriever">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" rows="4" placeholder="Describe the item..." required></textarea>
+                        <small class="form-hint">Add unique details to help verify.</small>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <select id="category" name="category" required>
-                        <option value="">Select a category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Documents">Documents</option>
-                        <option value="Clothing">Clothing</option>
-                        <option value="Accessories">Accessories</option>
-                        <option value="Books">Books/Stationery</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Documents">Documents</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Books">Books/Stationery</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="date">Date Lost/Found</label>
-                    <input type="date" id="date" name="date" required>
-                </div>
+                    <div class="form-group">
+                        <label for="location">Location *</label>
+                        <input type="text" id="location" name="location" placeholder="Where was it lost/found?" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="location">Location</label>
-                    <input type="text" id="location" name="location" required placeholder="e.g. Library 2nd Floor">
-                </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Lost">Lost</option>
+                            <option value="Found">Found</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" rows="5" required
-                        placeholder="Provide details like color, brand, unique marks..."></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="date">Date *</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
 
-                <div class="form-group">
-                    <label>Upload Image</label>
-                    <div class="file-upload-wrapper">
-                        <input type="file" id="image" name="image" accept="image/*" class="file-upload-input"
-                            onchange="updateFileName(this)">
-                        <div class="file-upload-content" id="file-upload-text">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span>Click to upload image</span>
+                    <div class="form-group">
+                        <label>Item Image (optional)</label>
+                        <div class="file-upload-wrapper" id="file-upload-area">
+                            <input type="file" class="file-upload-input" id="image" name="image" accept="image/*">
+                            <div class="file-upload-content">
+                                <i class="fa-solid fa-image"></i>
+                                <span>Click to upload</span>
+                            </div>
+                        </div>
+                        <div id="image-preview" class="image-preview" style="display: none;">
+                            <img id="image-preview-img" alt="Preview">
+                            <button type="button" class="btn btn-outline" onclick="clearImage()">Remove</button>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="contact_info">Contact Details</label>
-                    <input type="text" id="contact_info" name="contact_info" required
-                        placeholder="Email or Phone Number">
-                    <small style="color: var(--color-text-muted); display: block; margin-top: 0.5rem;">This will be
-                        visible to
-                        users who view this item.</small>
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Continue</button>
+                    </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Report</button>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <div class="report-step" data-step="2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="contact_info">Contact Info *</label>
+                        <input type="text" id="contact_info" name="contact_info" placeholder="Phone or Email" required>
+                        <small class="form-hint">This will be shown only after claim verification.</small>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline" onclick="prevStep()">Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-step" data-step="3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="security_question">Security Question (optional)</label>
+                        <input type="text" id="security_question" name="security_question" placeholder="e.g. What color is the wallet?">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="security_answer">Security Answer (optional)</label>
+                        <input type="text" id="security_answer" name="security_answer" placeholder="Answer to verify claim">
+                        <small class="form-hint">Use a detail only the real owner would know.</small>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline" onclick="prevStep()">Back</button>
+                        <button type="submit" class="btn btn-primary">Submit Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 <script>
-    // Pre-select status if passed in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const statusParam = urlParams.get('status');
-    if (statusParam) {
-        document.getElementById('status').value = statusParam;
-        toggleSecuritySection(statusParam);
+    let currentStep = 1;
+
+    function showStep(step) {
+        document.querySelectorAll('.report-step').forEach(el => {
+            el.classList.remove('active');
+        });
+        document.querySelector(`.report-step[data-step="${step}"]`).classList.add('active');
+
+        document.querySelectorAll('.progress-step').forEach(el => {
+            const stepNum = Number(el.dataset.step);
+            el.classList.toggle('active', stepNum === step);
+            el.classList.toggle('done', stepNum < step);
+        });
     }
 
-    function toggleSecuritySection(status) {
-        const section = document.getElementById('security-section');
-        if (status === 'Found') {
-            section.style.display = 'block';
-        } else {
-            section.style.display = 'none';
+    function validateStep(step) {
+        const stepEl = document.querySelector(`.report-step[data-step="${step}"]`);
+        const requiredFields = stepEl.querySelectorAll('[required]');
+        let valid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('input-error');
+                valid = false;
+            } else {
+                field.classList.remove('input-error');
+            }
+        });
+
+        if (!valid) {
+            showToast('Please fill all required fields.', 'error');
+        }
+        return valid;
+    }
+
+    function nextStep() {
+        if (!validateStep(currentStep)) return;
+        if (currentStep < 3) {
+            currentStep += 1;
+            showStep(currentStep);
         }
     }
 
-    function updateFileName(input) {
-        const fileName = input.files[0]?.name;
-        const textElement = document.getElementById('file-upload-text');
-        if (fileName) {
-            textElement.innerHTML = `<i class="fa-solid fa-check" style="color: #4ade80;"></i><span>${fileName}</span>`;
-        } else {
-            textElement.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Click to upload image</span>`;
+    function prevStep() {
+        if (currentStep > 1) {
+            currentStep -= 1;
+            showStep(currentStep);
         }
     }
+
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('image-preview-img');
+
+    imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            previewImg.src = e.target.result;
+            preview.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function clearImage() {
+        imageInput.value = '';
+        preview.style.display = 'none';
+        previewImg.src = '';
+    }
+
+    document.getElementById('report-form').addEventListener('submit', (event) => {
+        if (!validateStep(currentStep)) {
+            event.preventDefault();
+        }
+    });
+
+    showStep(currentStep);
 </script>
 {% endblock %}

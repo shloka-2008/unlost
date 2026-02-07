@@ -1,0 +1,94 @@
+{% macro render_item_card(item) %}
+<div class="card">
+    {% if item.image_file %}
+    <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}"
+        class="card-img">
+    {% else %}
+    <div class="card-img"
+        style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); font-size: 3rem; color: var(--color-text-muted);">
+        <i class="fa-solid fa-image"></i>
+    </div>
+    {% endif %}
+
+    <div class="card-body" style="flex: 1; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <span class="badge {{ item.status.lower() }}">{{ item.status }}</span>
+            <span
+                style="font-size: 0.85rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.3rem;">
+                <i class="fa-regular fa-calendar"></i> {{ item.date.strftime('%Y-%m-%d') }}
+            </span>
+        </div>
+
+        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">{{ item.title }}</h3>
+        <p
+            style="color: var(--color-text-muted); margin-bottom: 1rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-location-dot"></i> {{ item.location }}
+        </p>
+        <p style="margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.6;">{{ item.description[:100] }}{% if
+            item.description|length
+            > 100 %}...{% endif %}</p>
+
+        <div style="margin-top: auto;">
+            {% if item.security_question %}
+            <div id="claim-section-{{ item._id }}">
+                <button onclick="openClaimModal('{{ item._id }}', '{{ item.security_question|e }}')" class="btn btn-primary" style="width: 100%;">
+                    <i class="fa-solid fa-shield-halved"></i> Claim This Item
+                </button>
+            </div>
+
+            <div id="contact-info-{{ item._id }}" class="contact-info-box" style="display: none;">
+                <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 0.2rem;">
+                    Contact:</p>
+                <p id="contact-text-{{ item._id }}"></p>
+            </div>
+            {% else %}
+            <details>
+                <summary class="btn btn-outline"
+                    style="width: 100%; text-align: center; cursor: pointer; list-style: none;">
+                    View Contact Info
+                </summary>
+                <div class="contact-info-box">
+                    <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 0.2rem;">
+                        Contact:</p>
+                    <p>{{ item.contact_info }}</p>
+                </div>
+            </details>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% set found_items = items | selectattr('status', 'equalto', 'Found') | list %}
+{% set lost_items = items | selectattr('status', 'equalto', 'Lost') | list %}
+
+{% if items %}
+{% if found_items %}
+<h2
+    style="margin-top: 2rem; margin-bottom: 1rem; color: var(--color-primary); display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fa-solid fa-check-circle"></i> Found Items
+</h2>
+<div class="card-grid">
+    {% for item in found_items %}
+    {{ render_item_card(item) }}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if lost_items %}
+<h2 style="margin-top: 3rem; margin-bottom: 1rem; color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fa-solid fa-circle-exclamation"></i> Lost Items
+</h2>
+<div class="card-grid">
+    {% for item in lost_items %}
+    {{ render_item_card(item) }}
+    {% endfor %}
+</div>
+{% endif %}
+{% else %}
+<div style="text-align: center; padding: 6rem 2rem; color: var(--color-text-muted);">
+    <i class="fa-solid fa-ghost" style="font-size: 4rem; margin-bottom: 1.5rem; color: var(--card-border);"></i>
+    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--color-text-main);">No items found</h2>
+    <p>Try adjusting your search filters or check back later.</p>
+</div>
+{% endif %}
