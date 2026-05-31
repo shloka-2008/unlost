@@ -118,7 +118,7 @@ const Login: React.FC = () => {
         {/* Alternate log ins */}
         <div className="space-y-4 pt-6 border-t border-white/5 z-10 relative">
           <a
-            href="/login/google"
+            href="/api/login/google"
             className="w-full py-3 bg-white hover:bg-slate-100 rounded-xl text-slate-900 font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow"
           >
             <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24">

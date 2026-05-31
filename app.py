@@ -5,6 +5,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_bcrypt import Bcrypt
 from bson.objectid import ObjectId
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 import string
@@ -13,6 +14,7 @@ import logging
 from authlib.integrations.flask_client import OAuth
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import secrets
+from flask_cors import CORS
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +26,8 @@ logger.setLevel(logging.DEBUG)
 load_dotenv(override=True)
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.secret_key = app.config['SECRET_KEY']  # Authlib requires secret_key to easily be accessible
 
@@ -339,12 +343,12 @@ def login():
 
 
 
-@app.route('/login/google')
+@app.route('/api/login/google')
 def login_google():
     redirect_uri = url_for('auth_google_callback', _external=True)
     return google.authorize_redirect(redirect_uri)
 
-@app.route('/auth/google/callback')
+@app.route('/api/auth/google/callback')
 def auth_google_callback():
     token = google.authorize_access_token()
     user_info = token.get('userinfo')
