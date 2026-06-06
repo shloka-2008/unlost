@@ -28,7 +28,7 @@ load_dotenv(override=True)
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key_here')
 app.secret_key = app.config['SECRET_KEY']  # Authlib requires secret_key to easily be accessible
 
 # Email Configuration (for 2FA)
