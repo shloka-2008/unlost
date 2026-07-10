@@ -1,10 +1,10 @@
 services:
   - type: web
     name: unlost-backend
-    env: python
+    env: node
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: MONGO_URI
         sync: false

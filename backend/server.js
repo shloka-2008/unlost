@@ -1,0 +1,75 @@
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import apiRouter from './routes/api.js';
+
+// Resolve __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from .env
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Enable CORS
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static uploads
+app.use('/static', express.static(path.join(__dirname, 'static')));
+
+// Connect to MongoDB
+const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/unlost';
+console.log(`Connecting to MongoDB...`);
+
+mongoose.connect(mongoURI)
+  .then(() => console.log('MongoDB connected successfully!'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+
+// Session configuration
+app.use(session({
+  secret: process.env.SECRET_KEY || 'unlost_session_secret_123',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoURI,
+    collectionName: 'sessions',
+    ttl: 24 * 60 * 60 // 1 day
+  }),
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false // Set to true in production with HTTPS
+  }
+}));
+
+// Route handler
+app.use('/', apiRouter);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: err.message || 'Internal Server Error' });
+});
+
+// Start listening
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

@@ -1,0 +1,52 @@
+import mongoose from 'mongoose';
+
+const itemSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: ['Lost', 'Found', 'Archived'],
+    default: 'Lost'
+  },
+  contact_info: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  image_file: {
+    type: String
+  },
+  security_question: {
+    type: String
+  },
+  security_answer: {
+    type: String
+  },
+  reporter_email: {
+    type: String,
+    default: 'Anonymous'
+  }
+});
+
+const Item = mongoose.model('Item', itemSchema, 'items');
+
+export default Item;
