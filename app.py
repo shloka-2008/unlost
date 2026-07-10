@@ -61,6 +61,7 @@ jwt = JWTManager(app)
 # --- Google OAuth Configuration ---
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
 app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
+app.config['GOOGLE_REDIRECT_URI'] = os.getenv('GOOGLE_REDIRECT_URI')
 
 oauth = OAuth(app)
 google = oauth.register(
@@ -81,6 +82,20 @@ google = oauth.register(
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+def get_google_redirect_uri():
+    configured_redirect_uri = app.config.get('GOOGLE_REDIRECT_URI')
+    if configured_redirect_uri:
+        return configured_redirect_uri
+
+    referer = request.headers.get('Referer')
+    if referer:
+        from urllib.parse import urlparse
+        parsed = urlparse(referer)
+        if parsed.scheme and parsed.netloc:
+            return f"{parsed.scheme}://{parsed.netloc}/api/auth/google/callback"
+
+    return url_for('auth_google_callback', _external=True)
 
 @app.errorhandler(Exception)
 def handle_exception(error):
@@ -358,14 +373,7 @@ def login_google():
         flash('Google login is not configured. Please set Google OAuth credentials.', 'danger')
         return redirect(url_for('login'))
 
-    referer = request.headers.get('Referer')
-    if referer:
-        from urllib.parse import urlparse
-        parsed = urlparse(referer)
-        redirect_uri = f"{parsed.scheme}://{parsed.netloc}/api/auth/google/callback"
-    else:
-        redirect_uri = url_for('auth_google_callback', _external=True)
-    
+    redirect_uri = get_google_redirect_uri()
     session['oauth_redirect_uri'] = redirect_uri
     try:
         return google.authorize_redirect(redirect_uri)
@@ -373,6 +381,14 @@ def login_google():
         logger.error(f"Google OAuth redirect failed: {error}")
         flash('Google login could not be started. Please try again.', 'danger')
         return redirect(url_for('login'))
+
+@app.route('/api/oauth/google/config')
+def google_oauth_config():
+    return {
+        "google_client_id_configured": bool(app.config['GOOGLE_CLIENT_ID']),
+        "google_client_secret_configured": bool(app.config['GOOGLE_CLIENT_SECRET']),
+        "google_redirect_uri": get_google_redirect_uri(),
+    }, 200
 
 @app.route('/api/auth/google/callback')
 def auth_google_callback():
