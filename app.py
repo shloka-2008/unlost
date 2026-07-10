@@ -11,7 +11,9 @@ from dotenv import load_dotenv
 import string
 import traceback
 import logging
+from requests.exceptions import RequestException
 from authlib.integrations.flask_client import OAuth
+from authlib.integrations.base_client import OAuthError
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import secrets
 from flask_cors import CORS
@@ -65,7 +67,13 @@ google = oauth.register(
     name='google',
     client_id=app.config['GOOGLE_CLIENT_ID'],
     client_secret=app.config['GOOGLE_CLIENT_SECRET'],
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    authorize_url='https://accounts.google.com/o/oauth2/v2/auth',
+    access_token_url='https://oauth2.googleapis.com/token',
+    api_base_url='https://openidconnect.googleapis.com/v1/',
+    issuer='https://accounts.google.com',
+    jwks_uri='https://www.googleapis.com/oauth2/v3/certs',
+    userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
+    id_token_signing_alg_values_supported=['RS256'],
     client_kwargs={
         'scope': 'openid email profile'
     }
@@ -346,6 +354,10 @@ def login():
 @app.route('/api/login/google')
 def login_google():
     from flask import session
+    if not app.config['GOOGLE_CLIENT_ID'] or not app.config['GOOGLE_CLIENT_SECRET']:
+        flash('Google login is not configured. Please set Google OAuth credentials.', 'danger')
+        return redirect(url_for('login'))
+
     referer = request.headers.get('Referer')
     if referer:
         from urllib.parse import urlparse
@@ -355,13 +367,24 @@ def login_google():
         redirect_uri = url_for('auth_google_callback', _external=True)
     
     session['oauth_redirect_uri'] = redirect_uri
-    return google.authorize_redirect(redirect_uri)
+    try:
+        return google.authorize_redirect(redirect_uri)
+    except (OAuthError, RequestException) as error:
+        logger.error(f"Google OAuth redirect failed: {error}")
+        flash('Google login could not be started. Please try again.', 'danger')
+        return redirect(url_for('login'))
 
 @app.route('/api/auth/google/callback')
 def auth_google_callback():
     from flask import session
     redirect_uri = session.pop('oauth_redirect_uri', None)
-    token = google.authorize_access_token(redirect_uri=redirect_uri)
+    try:
+        token = google.authorize_access_token(redirect_uri=redirect_uri)
+    except (OAuthError, RequestException) as error:
+        logger.error(f"Google OAuth callback failed: {error}")
+        flash('Google login failed. Please try again.', 'danger')
+        return redirect(url_for('login'))
+
     user_info = token.get('userinfo')
     
     if not user_info:
