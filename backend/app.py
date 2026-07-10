@@ -83,6 +83,13 @@ google = oauth.register(
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    if request.path.startswith('/api/'):
+        return {"success": False, "message": "Unauthorized"}, 401
+    return redirect(url_for('login'))
+
+
 def get_google_redirect_uri():
     configured_redirect_uri = app.config.get('GOOGLE_REDIRECT_URI')
     if configured_redirect_uri:
