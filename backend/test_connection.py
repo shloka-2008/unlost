@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 import sys
 
-load_dotenv()
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
 
 uri = os.getenv('MONGO_URI')
 print(f"Loaded URI from env: {uri[:15]}...{uri[-10:] if uri else 'None'}")

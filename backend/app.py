@@ -25,7 +25,8 @@ logger.setLevel(logging.DEBUG)
 
 # Load environment variables from .env file
 # Load environment variables from .env file, overriding system vars
-load_dotenv(override=True)
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'), override=True)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)

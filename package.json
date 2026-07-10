@@ -1,0 +1,14 @@
+{
+  "name": "unlost-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix frontend install",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "backend\\.venv_new\\Scripts\\python.exe backend\\app.py",
+    "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

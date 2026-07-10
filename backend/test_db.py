@@ -3,7 +3,8 @@ import certifi
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-load_dotenv()
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
 
 uri = os.getenv('MONGO_URI')
 print(f"Testing connection to: {uri.split('@')[1] if '@' in uri else 'LOCAL/UNKNOWN'}")
