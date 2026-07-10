@@ -345,12 +345,23 @@ def login():
 
 @app.route('/api/login/google')
 def login_google():
-    redirect_uri = url_for('auth_google_callback', _external=True)
+    from flask import session
+    referer = request.headers.get('Referer')
+    if referer:
+        from urllib.parse import urlparse
+        parsed = urlparse(referer)
+        redirect_uri = f"{parsed.scheme}://{parsed.netloc}/api/auth/google/callback"
+    else:
+        redirect_uri = url_for('auth_google_callback', _external=True)
+    
+    session['oauth_redirect_uri'] = redirect_uri
     return google.authorize_redirect(redirect_uri)
 
 @app.route('/api/auth/google/callback')
 def auth_google_callback():
-    token = google.authorize_access_token()
+    from flask import session
+    redirect_uri = session.pop('oauth_redirect_uri', None)
+    token = google.authorize_access_token(redirect_uri=redirect_uri)
     user_info = token.get('userinfo')
     
     if not user_info:
@@ -382,6 +393,13 @@ def auth_google_callback():
         
     user = User(user_data)
     login_user(user)
+    
+    # Redirect back to frontend homepage if it was requested from frontend
+    if redirect_uri:
+        from urllib.parse import urlparse
+        parsed = urlparse(redirect_uri)
+        frontend_url = f"{parsed.scheme}://{parsed.netloc}"
+        return redirect(frontend_url)
     return redirect(url_for('home'))
 
 @app.route('/api/user')
