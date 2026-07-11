@@ -72,8 +72,9 @@ const SmiloRobot: React.FC<{
     isWaving: boolean;
     isClicked: boolean;
     isHovered: boolean;
+    isWavingHover: boolean;
     mood: string;
-}> = ({ mouseX, mouseY, isWaving, isClicked, isHovered, mood }) => {
+}> = ({ mouseX, mouseY, isWaving, isClicked, isHovered, isWavingHover, mood }) => {
 
     // Spring-smoothed mouse-driven head rotation
     const rotY = useSpring(useMotionValue(mouseX * 20), { stiffness: 60, damping: 18 });
@@ -98,21 +99,77 @@ const SmiloRobot: React.FC<{
         mood === 'thinking' ? '#67e8f9' : '#a3e635';
 
     return (
-        <div className="sm-root" style={{ transform: isClicked ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.22s cubic-bezier(0.34,1.56,0.64,1)' }}>
+        <motion.div
+            className="sm-root"
+            animate={isWavingHover ? {
+                y: [0, -3, 0],
+                rotate: [0, 3, -3, 0]
+            } : {
+                y: 0,
+                rotate: 0
+            }}
+            transition={isWavingHover ? {
+                y: { duration: 0.9, repeat: 2, ease: 'easeInOut' },
+                rotate: { duration: 1.8, ease: 'easeInOut' }
+            } : {
+                duration: 0.5, ease: [0.22, 1, 0.36, 1]
+            }}
+            style={{
+                transform: isClicked ? 'scale(1.1)' : 'scale(1)',
+                transition: 'transform 0.22s cubic-bezier(0.34,1.56,0.64,1)',
+                transformStyle: 'preserve-3d'
+            }}
+        >
+            {/* Greeting Speech Bubble on hover */}
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    top: '25px',
+                    left: '-58px', // positioned on the left side of the robot (viewer's left)
+                    background: 'rgba(15, 23, 42, 0.96)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '12px 12px 2px 12px', // points to the robot on the right
+                    padding: '6px 12px',
+                    color: '#fff',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    fontFamily: "'Inter', sans-serif",
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+                    zIndex: 20,
+                    pointerEvents: 'none'
+                }}
+                animate={isHovered ? {
+                    opacity: [0, 1, 1, 1, 0],
+                    scale: [0.6, 1.05, 1, 1, 0.6],
+                    x: [15, -2, 0, 0, -15],
+                } : {
+                    opacity: 0,
+                    scale: 0.6,
+                    x: 15
+                }}
+                transition={{
+                    duration: 1.8,
+                    times: [0, 0.12, 0.2, 0.85, 1.0],
+                    ease: [0.22, 1, 0.36, 1]
+                }}
+            >
+                👋 Hello!
+            </motion.div>
 
             {/* ── ANTENNA (floats with head) ── */}
             <div className="sm-antenna-wrap">
                 <motion.div
                     className="sm-antenna-orb"
                     animate={{
-                        scale: [1, 1.4, 1],
+                        scale: [1, 1.3, 1],
                         boxShadow: [
                             `0 0 10px ${antOrb}, 0 0 22px ${antOrb}88`,
-                            `0 0 16px ${antOrb}, 0 0 36px ${antOrb}bb`,
+                            `0 0 15px ${antOrb}, 0 0 30px ${antOrb}bb`,
                             `0 0 10px ${antOrb}, 0 0 22px ${antOrb}88`,
                         ],
                     }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                    transition={{ duration: 2.0, repeat: Infinity, ease: 'easeInOut' }}
                     style={{ background: `radial-gradient(circle at 35% 30%, #fff 0%, ${antOrb} 55%, ${antOrb}88 100%)` }}
                 />
                 <div className="sm-antenna-stem" />
@@ -124,19 +181,21 @@ const SmiloRobot: React.FC<{
                 style={{
                     rotateY: rotY,
                     rotateX: rotX,
-                    rotateZ: isHovered ? undefined : rotZ,
+                    rotateZ: rotZ,
                     transformStyle: 'preserve-3d',
                     transformPerspective: 320,
                 }}
-                animate={isHovered ? {
+                animate={isWavingHover ? {
                     y: [0, -5, 0],
-                    rotateZ: [0, 8, -8, 8, -8, 0]
+                    rotateY: [0, 8, 8, 0], // turns head slightly toward the user (looks left/forward)
+                    rotateZ: [0, 4, 4, 0]  // head tilts slightly
                 } : {
                     y: [0, -5, 0],
                 }}
-                transition={isHovered ? {
-                    y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' },
-                    rotateZ: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
+                transition={isWavingHover ? {
+                    y: { duration: 1.8, ease: [0.22, 1, 0.36, 1] },
+                    rotateY: { duration: 1.8, ease: [0.22, 1, 0.36, 1] },
+                    rotateZ: { duration: 1.8, ease: [0.22, 1, 0.36, 1] }
                 } : {
                     y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }
                 }}
@@ -166,9 +225,13 @@ const SmiloRobot: React.FC<{
                         >
                             <motion.div
                                 className="sm-eye"
-                                style={{ background: eyeColor, transition: 'background 0.35s ease' }}
+                                style={{ background: isWavingHover ? '#67e8f9' : eyeColor, transition: 'background 0.35s ease' }}
                                 animate={{
-                                    boxShadow: [
+                                    boxShadow: isWavingHover ? [
+                                        `0 0 10px #67e8f9, 0 0 22px rgba(103, 232, 249, 0.8)`,
+                                        `0 0 16px #67e8f9, 0 0 32px rgba(103, 232, 249, 1)`,
+                                        `0 0 10px #67e8f9, 0 0 22px rgba(103, 232, 249, 0.8)`,
+                                    ] : [
                                         `0 0 6px ${eyeColor}, 0 0 14px ${eyeColor}88`,
                                         `0 0 10px ${eyeColor}, 0 0 22px ${eyeColor}`,
                                         `0 0 6px ${eyeColor}, 0 0 14px ${eyeColor}88`,
@@ -178,9 +241,13 @@ const SmiloRobot: React.FC<{
                             />
                             <motion.div
                                 className="sm-eye"
-                                style={{ background: eyeColor, transition: 'background 0.35s ease' }}
+                                style={{ background: isWavingHover ? '#67e8f9' : eyeColor, transition: 'background 0.35s ease' }}
                                 animate={{
-                                    boxShadow: [
+                                    boxShadow: isWavingHover ? [
+                                        `0 0 10px #67e8f9, 0 0 22px rgba(103, 232, 249, 0.8)`,
+                                        `0 0 16px #67e8f9, 0 0 32px rgba(103, 232, 249, 1)`,
+                                        `0 0 10px #67e8f9, 0 0 22px rgba(103, 232, 249, 0.8)`,
+                                    ] : [
                                         `0 0 6px ${eyeColor}, 0 0 14px ${eyeColor}88`,
                                         `0 0 10px ${eyeColor}, 0 0 22px ${eyeColor}`,
                                         `0 0 6px ${eyeColor}, 0 0 14px ${eyeColor}88`,
@@ -221,12 +288,7 @@ const SmiloRobot: React.FC<{
             </motion.div>
 
             {/* ── NECK ── */}
-            <motion.div
-                className="sm-neck"
-                animate={isHovered ? { rotate: [0, -5, 5, -5, 5, 0] } : { rotate: 0 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ transformOrigin: 'bottom center' }}
-            />
+            <div className="sm-neck" />
 
             {/* ── ACCENT RING ── */}
             <motion.div
@@ -254,16 +316,12 @@ const SmiloRobot: React.FC<{
                 <motion.div
                     className="sm-arm sm-arm--l"
                     animate={
-                        isHovered
-                            ? { rotate: [60, 75, 45, 75, 45, 60] }
-                            : isWaving
+                        isWaving
                             ? { rotate: [0, 55, 10, 55, 15, 0] }
                             : { rotate: [0, -9, 0, 9, 0] }
                     }
                     transition={
-                        isHovered
-                            ? { duration: 0.6, repeat: Infinity, ease: 'easeInOut' }
-                            : isWaving
+                        isWaving
                             ? { duration: 1.6, ease: 'easeInOut' }
                             : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
                     }
@@ -310,15 +368,15 @@ const SmiloRobot: React.FC<{
                 <motion.div
                     className="sm-arm sm-arm--r"
                     animate={
-                        isHovered
-                            ? { rotate: [-60, -75, -45, -75, -45, -60] }
+                        isWavingHover
+                            ? { rotate: [0, -65, -75, -50, -75, -50, -75, -50, 0] }
                             : isWaving
                             ? { rotate: [0, -55, -10, -55, -15, 0] }
                             : { rotate: [0, 9, 0, -9, 0] }
                     }
                     transition={
-                        isHovered
-                            ? { duration: 0.6, repeat: Infinity, ease: 'easeInOut' }
+                        isWavingHover
+                            ? { duration: 1.8, ease: [0.22, 1, 0.36, 1] }
                             : isWaving
                             ? { duration: 1.6, ease: 'easeInOut' }
                             : { duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 0.28 }
@@ -338,8 +396,15 @@ const SmiloRobot: React.FC<{
             </motion.div>
 
             {/* Ground glow shadow */}
-            <div className="sm-shadow" />
-        </div>
+            <div 
+                className="sm-shadow" 
+                style={{
+                    transform: `translateX(-50%) scale(${isHovered ? 0.75 : 1.0})`,
+                    opacity: isHovered ? 0.4 : 1.0,
+                    transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1)'
+                }}
+            />
+        </motion.div>
     );
 };
 
@@ -353,6 +418,33 @@ const SmiloWidget: React.FC = () => {
     const [isWaving, setIsWaving]   = useState(false);
     const [isClicked, setIsClicked] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const [isWavingHover, setIsWavingHover] = useState(false);
+
+    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = () => {
+        setIsHovered(true);
+        setIsWavingHover(true);
+        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = setTimeout(() => {
+            setIsWavingHover(false);
+        }, 1800);
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+        setIsWavingHover(false);
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+        };
+    }, []);
     const [mood, setMood]           = useState<'idle'|'thinking'|'happy'|'excited'>('thinking');
     const [msgIndex, setMsgIndex]   = useState(0);
     const [showMsg, setShowMsg]     = useState(false);
@@ -923,6 +1015,14 @@ const SmiloWidget: React.FC = () => {
                 @keyframes sm-ring-out { 0%{transform:scale(1);opacity:0.65} 100%{transform:scale(3.4);opacity:0} }
                 @keyframes sm-particle  { 0%{transform:translate(0,0) scale(1.1);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0} }
                 @keyframes sm-wbar { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(0.25)} }
+
+                @keyframes sm-reflection-sweep {
+                    0% { transform: translateX(-150%) skewX(-25deg); opacity: 0; }
+                    10% { opacity: 0.25; }
+                    30% { transform: translateX(150%) skewX(-25deg); opacity: 0; }
+                    100% { transform: translateX(150%) skewX(-25deg); opacity: 0; }
+                }
+
                 .sm-widget-container {
                     position: fixed;
                     bottom: 24px;
@@ -1051,7 +1151,7 @@ const SmiloWidget: React.FC = () => {
                                         )}
                                     </div>
                                 </div>
-                            ))}
+                            )})}
 
                             {/* Typing Indicator */}
                             {botTyping && (
@@ -1220,8 +1320,8 @@ const SmiloWidget: React.FC = () => {
                 {/* ── THE ROBOT ── */}
                 <button
                     onClick={handleClick}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                     style={{background:'transparent',border:'none',cursor:'pointer',padding:0,outline:'none',WebkitTapHighlightColor:'transparent'}}
                     title="Click Smilo!"
                 >
@@ -1231,6 +1331,7 @@ const SmiloWidget: React.FC = () => {
                         isWaving={isWaving}
                         isClicked={isClicked}
                         isHovered={isHovered}
+                        isWavingHover={isWavingHover}
                         mood={mood}
                     />
                     {/* Label */}
