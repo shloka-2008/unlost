@@ -71,8 +71,9 @@ const SmiloRobot: React.FC<{
     mouseY: number;
     isWaving: boolean;
     isClicked: boolean;
+    isHovered: boolean;
     mood: string;
-}> = ({ mouseX, mouseY, isWaving, isClicked, mood }) => {
+}> = ({ mouseX, mouseY, isWaving, isClicked, isHovered, mood }) => {
 
     // Spring-smoothed mouse-driven head rotation
     const rotY = useSpring(useMotionValue(mouseX * 20), { stiffness: 60, damping: 18 });
@@ -123,12 +124,22 @@ const SmiloRobot: React.FC<{
                 style={{
                     rotateY: rotY,
                     rotateX: rotX,
-                    rotateZ: rotZ,
+                    rotateZ: isHovered ? undefined : rotZ,
                     transformStyle: 'preserve-3d',
                     transformPerspective: 320,
                 }}
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                animate={isHovered ? {
+                    y: [0, -5, 0],
+                    rotateZ: [0, 8, -8, 8, -8, 0]
+                } : {
+                    y: [0, -5, 0],
+                }}
+                transition={isHovered ? {
+                    y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' },
+                    rotateZ: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
+                } : {
+                    y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }
+                }}
             >
                 {/* Ears */}
                 <div className="sm-ear sm-ear--l">
@@ -210,7 +221,12 @@ const SmiloRobot: React.FC<{
             </motion.div>
 
             {/* ── NECK ── */}
-            <div className="sm-neck" />
+            <motion.div
+                className="sm-neck"
+                animate={isHovered ? { rotate: [0, -5, 5, -5, 5, 0] } : { rotate: 0 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ transformOrigin: 'bottom center' }}
+            />
 
             {/* ── ACCENT RING ── */}
             <motion.div
@@ -237,8 +253,20 @@ const SmiloRobot: React.FC<{
                 {/* LEFT ARM */}
                 <motion.div
                     className="sm-arm sm-arm--l"
-                    animate={{ rotate: [0, -9, 0, 9, 0] }}
-                    transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+                    animate={
+                        isHovered
+                            ? { rotate: [60, 75, 45, 75, 45, 60] }
+                            : isWaving
+                            ? { rotate: [0, 55, 10, 55, 15, 0] }
+                            : { rotate: [0, -9, 0, 9, 0] }
+                    }
+                    transition={
+                        isHovered
+                            ? { duration: 0.6, repeat: Infinity, ease: 'easeInOut' }
+                            : isWaving
+                            ? { duration: 1.6, ease: 'easeInOut' }
+                            : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
+                    }
                     style={{ transformOrigin: '80% 5%' }}
                 >
                     <div className="sm-arm-upper" />
@@ -281,13 +309,19 @@ const SmiloRobot: React.FC<{
                 {/* RIGHT ARM — waves on click */}
                 <motion.div
                     className="sm-arm sm-arm--r"
-                    animate={isWaving
-                        ? { rotate: [0, -55, -10, -55, -15, 0] }
-                        : { rotate: [0, 9, 0, -9, 0] }
+                    animate={
+                        isHovered
+                            ? { rotate: [-60, -75, -45, -75, -45, -60] }
+                            : isWaving
+                            ? { rotate: [0, -55, -10, -55, -15, 0] }
+                            : { rotate: [0, 9, 0, -9, 0] }
                     }
-                    transition={isWaving
-                        ? { duration: 1.6, ease: 'easeInOut' }
-                        : { duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 0.28 }
+                    transition={
+                        isHovered
+                            ? { duration: 0.6, repeat: Infinity, ease: 'easeInOut' }
+                            : isWaving
+                            ? { duration: 1.6, ease: 'easeInOut' }
+                            : { duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 0.28 }
                     }
                     style={{ transformOrigin: '20% 5%' }}
                 >
@@ -318,6 +352,7 @@ const SmiloWidget: React.FC = () => {
     const [mouseY, setMouseY]       = useState(0);
     const [isWaving, setIsWaving]   = useState(false);
     const [isClicked, setIsClicked] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
     const [mood, setMood]           = useState<'idle'|'thinking'|'happy'|'excited'>('thinking');
     const [msgIndex, setMsgIndex]   = useState(0);
     const [showMsg, setShowMsg]     = useState(false);
@@ -1183,12 +1218,19 @@ const SmiloWidget: React.FC = () => {
                 </div>
 
                 {/* ── THE ROBOT ── */}
-                <button onClick={handleClick} style={{background:'transparent',border:'none',cursor:'pointer',padding:0,outline:'none',WebkitTapHighlightColor:'transparent'}} title="Click Smilo!">
+                <button
+                    onClick={handleClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{background:'transparent',border:'none',cursor:'pointer',padding:0,outline:'none',WebkitTapHighlightColor:'transparent'}}
+                    title="Click Smilo!"
+                >
                     <SmiloRobot
                         mouseX={mouseX}
                         mouseY={mouseY}
                         isWaving={isWaving}
                         isClicked={isClicked}
+                        isHovered={isHovered}
                         mood={mood}
                     />
                     {/* Label */}
