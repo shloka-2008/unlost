@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 /* ══════════════════════════════════════════════════════ */
@@ -42,8 +42,26 @@ const playChime = (type: 'click' | 'think' | 'happy') => {
 };
 
 /* ── Data ── */
-const MSGS   = ["Hi! I'm Smilo 😊", "Hello! ✨", "How can I help?", "Click me again~", "Let's build UI!", "Ready to go! ⚡", "UI HUB is 💙", "Beep boop~ 🤖"];
+const MSGS   = ["Hi! I'm Smilo 😊", "Hello! ✨", "How can I help?", "Let's explore UNLOST!", "Ready to search! ⚡", "UNLOST is 💙", "Beep boop~ 🤖"];
 const THINKS = ["Thinking...", "Processing...", "Analyzing...", "Computing...", "Loading AI..."];
+
+interface Item {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    location: string;
+    status: string;
+    date: string;
+    image_file: string | null;
+}
+
+interface Message {
+    sender: 'user' | 'bot';
+    text: string;
+    timestamp: Date;
+    items?: Item[];
+}
 
 /* ══════════════════════════════════════════════════════ */
 /*            SMILO ROBOT – Framer Motion driven          */
@@ -295,6 +313,7 @@ const SmiloRobot: React.FC<{
 /*                     WIDGET MAIN                        */
 /* ══════════════════════════════════════════════════════ */
 const SmiloWidget: React.FC = () => {
+    const messagesEndRef = useRef<HTMLDivElement>(null);
     const [mouseX, setMouseX]       = useState(0);
     const [mouseY, setMouseY]       = useState(0);
     const [isWaving, setIsWaving]   = useState(false);
@@ -307,6 +326,14 @@ const SmiloWidget: React.FC = () => {
     const [soundActive, setSoundActive] = useState(false);
     const [particles, setParticles] = useState<{id:number;angle:number;color:string;dist:number}[]>([]);
     const [clickCount, setClickCount] = useState(0);
+
+    // Chat Panel State
+    const [chatOpen, setChatOpen] = useState(false);
+    const [messages, setMessages] = useState<Message[]>([
+        { sender: 'bot', text: "Hi! I'm Smilo, your UNLOST assistant. Ask me anything about lost & found items or how to use the portal! 😊", timestamp: new Date() }
+    ]);
+    const [inputValue, setInputValue] = useState('');
+    const [botTyping, setBotTyping] = useState(false);
 
     // Global mouse position tracking relative to viewport
     useEffect(() => {
@@ -324,6 +351,17 @@ const SmiloWidget: React.FC = () => {
         return () => clearInterval(t);
     }, []);
 
+    // Auto-scroll chat panel to bottom
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        if (chatOpen) {
+            scrollToBottom();
+        }
+    }, [messages, chatOpen, botTyping]);
+
     const spawnParticles = useCallback(() => {
         const cols = ['#86efac','#7dd3fc','#c4b5fd','#facc15','#f9a8d4','#ffffff'];
         const ps = Array.from({length:14},(_,i)=>({
@@ -338,7 +376,7 @@ const SmiloWidget: React.FC = () => {
 
     const handleClick = () => {
         setClickCount(c => c + 1);
-        playChime('click');
+        playChime('happy');
         setSoundActive(true); 
         setTimeout(() => setSoundActive(false), 900);
         setIsClicked(true);
@@ -348,6 +386,8 @@ const SmiloWidget: React.FC = () => {
         setMsgIndex(p => (p + 1) % MSGS.length);
         setShowMsg(true);
         spawnParticles();
+        setChatOpen(true); // Open AI Chat panel on click
+        
         setTimeout(() => setIsClicked(false), 280);
         setTimeout(() => { 
             setIsWaving(false); 
@@ -355,6 +395,110 @@ const SmiloWidget: React.FC = () => {
             setIsThinking(true); 
         }, 2200);
         setTimeout(() => setShowMsg(false), 4000);
+    };
+
+    const getBotResponse = async (text: string): Promise<{ text: string; items?: Item[] }> => {
+        const query = text.toLowerCase().trim();
+        
+        if (query.includes('hi') || query.includes('hello') || query.includes('hey') || query.includes('yo')) {
+            return { text: "Hello there! How can I help you navigate the UNLOST portal today? 😊" };
+        }
+        
+        if (query.includes('report') || query.includes('lost') || query.includes('found') || query.includes('submit')) {
+            return { text: "To report an item, please navigate to the [Report Page](/report) using the top navigation bar. Fill out details like the item name, location, and optional image to help others identify it." };
+        }
+        
+        if (query.includes('claim') || query.includes('recover') || query.includes('get back') || query.includes('security')) {
+            return { text: "To claim a found item, click 'View Details' on the item on the [Items Page](/items). You will be prompted to answer a security question set by the reporter. Correct answers will unlock their contact information!" };
+        }
+
+        if (query.includes('latest') || query.includes('recent') || query.includes('activity') || query.includes('show items')) {
+            try {
+                const response = await fetch('/api/items');
+                const data = await response.json();
+                if (response.ok && data.success && data.items.length > 0) {
+                    const topItems = data.items.slice(0, 3);
+                    return { 
+                        text: "Here are some of the most recently reported items on UNLOST:",
+                        items: topItems
+                    };
+                }
+            } catch (err) {
+                console.error("Error fetching items in chat:", err);
+            }
+            return { text: "I couldn't fetch the latest items right now, but you can view them on the [Items Page](/items)!" };
+        }
+        
+        if (query.includes('contact') || query.includes('admin') || query.includes('help') || query.includes('support')) {
+            return { text: "If you have issues or feedback, you can send an inquiry directly on our [Contact Page](/contact) to reach the admin team." };
+        }
+
+        if (query.includes('profile') || query.includes('my log') || query.includes('stats')) {
+            return { text: "You can view your history of reported and claimed items, along with account logs, on your [Profile Page](/profile)." };
+        }
+
+        return { text: "I'm here to help with UNLOST! Try asking:\n- 'Show latest items'\n- 'How to report an item'\n- 'How to claim/recover an item'\n- 'How does security check work?'" };
+    };
+
+    const handleSendMessage = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (!inputValue.trim()) return;
+
+        const userText = inputValue;
+        setInputValue('');
+        
+        // Add user message
+        setMessages(prev => [...prev, { sender: 'user', text: userText, timestamp: new Date() }]);
+        
+        // Audio feed, waving, change mood to thinking
+        playChime('think');
+        setSoundActive(true);
+        setTimeout(() => setSoundActive(false), 950);
+        setMood('thinking');
+        setBotTyping(true);
+        setIsThinking(true);
+        
+        // Simulate thinking delay
+        setTimeout(async () => {
+            const response = await getBotResponse(userText);
+            setMessages(prev => [...prev, { 
+                sender: 'bot', 
+                text: response.text, 
+                timestamp: new Date(),
+                items: response.items 
+            }]);
+            setBotTyping(false);
+            setIsThinking(false);
+            setMood('happy');
+            playChime('click');
+            spawnParticles();
+        }, 1200);
+    };
+
+    const parseMarkdownLinks = (text: string) => {
+        const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+        const parts = [];
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+                parts.push(text.substring(lastIndex, match.index));
+            }
+            parts.push(
+                <a 
+                    key={match.index} 
+                    href={match[2]} 
+                    className="text-emerald-400 hover:underline hover:text-emerald-300 font-semibold"
+                >
+                    {match[1]}
+                </a>
+            );
+            lastIndex = regex.lastIndex;
+        }
+        if (lastIndex < text.length) {
+            parts.push(text.substring(lastIndex));
+        }
+        return parts.length > 0 ? parts : text;
     };
 
     const acc = mood==='excited'?'#facc15': mood==='thinking'?'#67e8f9': mood==='happy'?'#4ade80':'#a3e635';
@@ -769,8 +913,233 @@ const SmiloWidget: React.FC = () => {
                 transition={{ delay: 0.5, duration: 0.6, ease: [0.34,1.56,0.64,1] }}
                 className="sm-widget-container"
             >
-                {/* Thinking bubble — always on by default */}
-                {isThinking && !showMsg && (
+                {/* ── CHAT PANEL ── */}
+                {chatOpen && (
+                    <div style={{
+                        width: '330px',
+                        height: '420px',
+                        background: 'rgba(15, 23, 42, 0.95)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        backdropFilter: 'blur(16px)',
+                        borderRadius: '16px',
+                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                        marginBottom: '10px'
+                    }}>
+                        {/* Header */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '12px 16px',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.08))',
+                            width: '100%',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 8px #4ade80' }} />
+                                <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc', letterSpacing: '0.05em' }}>SMILO ASSISTANT</span>
+                            </div>
+                            <button 
+                                onClick={() => setChatOpen(false)} 
+                                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '16px' }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Message list */}
+                        <div style={{
+                            flex: 1,
+                            padding: '16px',
+                            overflowY: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                            scrollBehavior: 'smooth'
+                        }}>
+                            {messages.map((msg, i) => (
+                                <div 
+                                    key={i} 
+                                    style={{ 
+                                        display: 'flex', 
+                                        justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                        width: '100%'
+                                    }}
+                                >
+                                    <div style={{
+                                        maxWidth: '85%',
+                                        padding: '10px 14px',
+                                        borderRadius: msg.sender === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
+                                        background: msg.sender === 'user' 
+                                            ? 'linear-gradient(135deg, #6366f1, #a855f7)' 
+                                            : 'rgba(255, 255, 255, 0.04)',
+                                        border: msg.sender === 'user' ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                                        color: '#f8fafc',
+                                        fontSize: '12px',
+                                        lineHeight: '1.5',
+                                        whiteSpace: 'pre-line'
+                                    }}>
+                                        {msg.sender === 'bot' ? parseMarkdownLinks(msg.text) : msg.text}
+
+                                        {/* Display items if attached to bot response */}
+                                        {msg.items && msg.items.length > 0 && (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                                                {msg.items.map((item) => (
+                                                    <div 
+                                                        key={item.id} 
+                                                        style={{ 
+                                                            background: 'rgba(255, 255, 255, 0.03)', 
+                                                            border: '1px solid rgba(255, 255, 255, 0.05)', 
+                                                            borderRadius: '8px', 
+                                                            padding: '8px', 
+                                                            fontSize: '11px' 
+                                                        }}
+                                                    >
+                                                        <div style={{ fontWeight: 'bold', color: '#818cf8', display: 'flex', justifyContent: 'space-between' }}>
+                                                            <span>{item.title}</span>
+                                                            <span style={{ 
+                                                                fontSize: '9px', 
+                                                                padding: '1px 5px', 
+                                                                borderRadius: '999px',
+                                                                background: item.status === 'Lost' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                                                                color: item.status === 'Lost' ? '#fca5a5' : '#6ee7b7'
+                                                            }}>{item.status}</span>
+                                                        </div>
+                                                        <div style={{ color: '#94a3b8', marginTop: '2px' }}>Loc: {item.location}</div>
+                                                        <a href="/items" style={{ color: '#34d399', textDecoration: 'underline', display: 'block', marginTop: '4px', fontSize: '9px' }}>View on Items Page</a>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Typing Indicator */}
+                            {botTyping && (
+                                <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
+                                    <div style={{
+                                        padding: '10px 14px',
+                                        borderRadius: '14px 14px 14px 2px',
+                                        background: 'rgba(255, 255, 255, 0.04)',
+                                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                                        display: 'flex',
+                                        gap: '4px',
+                                        alignItems: 'center'
+                                    }}>
+                                        {[0,1,2].map((idx) => (
+                                            <div 
+                                                key={idx} 
+                                                style={{ 
+                                                    width: '4px', 
+                                                    height: '4px', 
+                                                    borderRadius: '50%', 
+                                                    background: '#67e8f9', 
+                                                    animation: 'sm-dot 1s ease-in-out infinite', 
+                                                    animationDelay: `${idx * 0.18}s` 
+                                                }} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Quick suggestions */}
+                        <div style={{
+                            padding: '8px 12px 0 12px',
+                            display: 'flex',
+                            gap: '6px',
+                            overflowX: 'auto',
+                            whiteSpace: 'nowrap',
+                            scrollbarWidth: 'none'
+                        }}>
+                            {[
+                                { label: '🔍 Latest Items', query: 'Show latest items' },
+                                { label: '➕ Report Item', query: 'How to report an item' },
+                                { label: '🔒 Claiming', query: 'How to claim an item' }
+                            ].map((s, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        setInputValue(s.query);
+                                        // Auto-focus and send in next event loop
+                                        setTimeout(() => handleSendMessage(), 50);
+                                    }}
+                                    style={{
+                                        fontSize: '10px',
+                                        padding: '4px 10px',
+                                        borderRadius: '999px',
+                                        background: 'rgba(255, 255, 255, 0.05)',
+                                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                                        color: '#cbd5e1',
+                                        cursor: 'pointer',
+                                        transition: 'background 0.2s',
+                                        outline: 'none'
+                                    }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+                                >
+                                    {s.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Form */}
+                        <form 
+                            onSubmit={handleSendMessage} 
+                            style={{
+                                display: 'flex',
+                                padding: '12px',
+                                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                                gap: '8px'
+                            }}
+                        >
+                            <input 
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="Ask Smilo..."
+                                style={{
+                                    flex: 1,
+                                    background: 'rgba(0, 0, 0, 0.3)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    borderRadius: '8px',
+                                    padding: '8px 12px',
+                                    fontSize: '12px',
+                                    color: '#f8fafc',
+                                    outline: 'none'
+                                }}
+                            />
+                            <button
+                                type="submit"
+                                style={{
+                                    background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    color: '#fff',
+                                    fontSize: '12px'
+                                }}
+                            >
+                                ➔
+                            </button>
+                        </form>
+                    </div>
+                )}
+
+                {/* Thinking bubble — always on by default when panel closed */}
+                {isThinking && !showMsg && !chatOpen && (
                     <div style={{padding:'6px 12px',borderRadius:'10px 10px 3px 10px',background:'rgba(6,8,22,0.92)',border:`1px solid ${acc}33`,backdropFilter:'blur(14px)',boxShadow:'0 4px 15px rgba(0,0,0,0.45)',animation:'sm-think-bbl 0.3s ease-out both',display:'flex',alignItems:'center',gap:6}}>
                         <div style={{fontSize:11,animation:'sm-spin 1.6s linear infinite',display:'inline-block'}}>⚙️</div>
                         <span style={{fontSize:10,color:`${acc}cc`,fontWeight:600,letterSpacing:'0.05em'}}>{THINKS[thinkIdx]}</span>
@@ -781,7 +1150,7 @@ const SmiloWidget: React.FC = () => {
                 )}
 
                 {/* Chat message */}
-                {showMsg && (
+                {showMsg && !chatOpen && (
                     <div style={{padding:'8px 12px',borderRadius:'11px 11px 3px 11px',background:'rgba(6,8,22,0.96)',border:`1px solid ${acc}44`,backdropFilter:'blur(16px)',color:'#fff',fontSize:11.5,fontWeight:600,whiteSpace:'nowrap',boxShadow:'0 6px 20px rgba(0,0,0,0.5)',animation:'sm-msg 0.3s ease-out both'}}>
                         {MSGS[msgIndex]}
                     </div>
@@ -828,7 +1197,7 @@ const SmiloWidget: React.FC = () => {
                     </div>
                 </button>
 
-                {clickCount > 0 && (
+                {clickCount > 0 && !chatOpen && (
                     <div style={{textAlign:'center',fontSize:8,color:'rgba(134,239,172,0.3)',letterSpacing:'0.1em',fontFamily:'monospace'}}>
                         × {clickCount} clicks
                     </div>
