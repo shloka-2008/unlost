@@ -29,12 +29,12 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 glass-panel border-b border-white/10 bg-slate-900/80 backdrop-blur-lg">
+    <nav className="sticky top-0 z-50 glass-panel border-b border-primary/10 bg-shade-5/80 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center space-x-2">
-              <span className="text-2xl font-extrabold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight font-heading">
+              <span className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent tracking-tight font-heading">
                 UNLOST
               </span>
             </Link>
@@ -46,16 +46,16 @@ const Navbar: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-1.5 ${
+                className={`relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 ${
                   isActive(item.href)
-                    ? 'text-white bg-slate-800/80 shadow-inner'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                    ? 'text-primary bg-secondary/10 shadow-inner'
+                    : 'text-secondary hover:text-primary hover:bg-secondary/5'
                 }`}
               >
                 {isActive(item.href) && (
                   <motion.div
                     layoutId="activePill"
-                    className="absolute inset-0 bg-slate-800/80 rounded-lg -z-10 border border-white/5"
+                    className="absolute inset-0 bg-secondary/10 rounded-lg -z-10 border border-primary/5"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -63,15 +63,15 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
             
-            <div className="h-6 w-px bg-slate-800 mx-2"></div>
+            <div className="h-6 w-px bg-secondary/20 mx-2"></div>
             
             <div className="flex items-center space-x-3">
-              <span className="text-xs font-semibold text-slate-400 border border-slate-800 rounded-full px-3 py-1 bg-slate-950/40">
+              <span className="text-xs font-semibold text-secondary border border-primary/10 rounded-full px-3 py-1 bg-white/40">
                 {user?.username}
               </span>
               <button
                 onClick={logout}
-                className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800/40 transition-all duration-200"
+                className="p-2 rounded-lg text-secondary hover:text-rose-500 hover:bg-secondary/5 transition-all duration-200"
                 title="Log Out"
               >
                 <LogOut className="h-5 w-5" />
@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-850 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-secondary hover:text-primary hover:bg-secondary/5 focus:outline-none"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-white/5 bg-slate-950/95"
+            className="md:hidden border-t border-primary/10 bg-shade-5/95"
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navigation.map((item) => (
@@ -106,24 +106,24 @@ const Navbar: React.FC = () => {
                   key={item.name}
                   to={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium transition-all ${
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-semibold transition-all ${
                     isActive(item.href)
-                      ? 'text-white bg-slate-800 shadow-inner'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                      ? 'text-primary bg-secondary/15 shadow-inner'
+                      : 'text-secondary hover:text-primary hover:bg-secondary/5'
                   }`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.name}</span>
                 </Link>
               ))}
-              <div className="border-t border-slate-900 my-2 pt-2 px-3 flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-400">{user?.username}</span>
+              <div className="border-t border-primary/10 my-2 pt-2 px-3 flex items-center justify-between">
+                <span className="text-sm font-semibold text-secondary">{user?.username}</span>
                 <button
                   onClick={() => {
                     setIsOpen(false);
                     logout();
                   }}
-                  className="flex items-center space-x-1 text-sm font-semibold text-rose-400 hover:text-rose-300"
+                  className="flex items-center space-x-1 text-sm font-bold text-rose-500 hover:text-rose-450"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>

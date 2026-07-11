@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-[#0f172a] text-slate-100 font-sans min-h-screen antialiased;
-    background-image: radial-gradient(circle at 50% 0%, #1e293ba6 0%, transparent 70%);
+    @apply bg-background text-primary font-sans min-h-screen antialiased;
+    background-image: radial-gradient(circle at 50% 0%, #F3E7D9 0%, transparent 75%);
   }
 
   /* Custom styled scrollbars */
@@ -15,29 +15,47 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-[#0f172a];
+    @apply bg-background;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-800 rounded-full border-2 border-[#0f172a] hover:bg-slate-700;
+    @apply bg-secondary/30 rounded-full border-2 border-background hover:bg-secondary/50;
   }
 }
 
 /* Glassmorphism utility classes */
 .glass-panel {
-  @apply bg-slate-900/60 backdrop-blur-md border border-white/10 shadow-xl;
+  background-color: rgba(243, 231, 217, 0.65);
+  border: 1px solid rgba(92, 50, 30, 0.1);
+  @apply backdrop-blur-md shadow-xl;
 }
 
 .glass-card {
-  @apply bg-slate-800/40 backdrop-blur-sm border border-white/5 shadow-md transition-all duration-300;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(92, 50, 30, 0.05);
+  @apply backdrop-blur-sm shadow-md transition-all duration-300;
 }
 
 .glass-card:hover {
-  @apply border-white/15 bg-slate-800/60 -translate-y-1 shadow-lg shadow-black/30;
+  border-color: rgba(92, 50, 30, 0.15);
+  background-color: rgba(255, 255, 255, 0.7);
+  @apply -translate-y-1 shadow-lg;
+  box-shadow: 0 10px 25px -5px rgba(92, 50, 30, 0.1), 0 8px 10px -6px rgba(92, 50, 30, 0.1);
 }
 
 .glass-input {
-  @apply bg-slate-950/40 border border-slate-800 text-slate-100 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-500;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(146, 99, 71, 0.2);
+  color: #5C321E;
+  @apply rounded-xl px-4 py-2.5 transition-all;
+}
+.glass-input:focus {
+  outline: none;
+  border-color: #5C321E;
+  box-shadow: 0 0 0 2px rgba(92, 50, 30, 0.15);
+}
+.glass-input::placeholder {
+  color: rgba(146, 99, 71, 0.55);
 }
 
 /* Float animations */
