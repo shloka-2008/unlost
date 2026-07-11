@@ -420,7 +420,7 @@ const SmiloWidget: React.FC = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [isWavingHover, setIsWavingHover] = useState(false);
 
-    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const hoverTimeoutRef = useRef<any>(null);
 
     const handleMouseEnter = () => {
         setIsHovered(true);
@@ -1151,7 +1151,7 @@ const SmiloWidget: React.FC = () => {
                                         )}
                                     </div>
                                 </div>
-                            )})}
+                            ))}
 
                             {/* Typing Indicator */}
                             {botTyping && (
