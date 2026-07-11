@@ -98,7 +98,7 @@ const Profile: React.FC = () => {
             </div>
             <div className="flex items-center gap-2.5">
               <Calendar className="h-4.5 w-4.5 text-slate-500 flex-shrink-0" />
-              <span>Created {formatDate(profileData?.user.date_created || null)}</span>
+              <span>Created {formatDate(profileData?.user?.date_created || null)}</span>
             </div>
           </div>
         </motion.div>

@@ -111,6 +111,15 @@ router.get('/api/login/google', (req, res) => {
     return res.status(400).send('Google OAuth is not configured. Please set credentials.');
   }
 
+  // Save the frontend URL to redirect back to after auth completes
+  const referer = req.headers.referer;
+  if (referer) {
+    try {
+      const parsed = new URL(referer);
+      req.session.frontendUrl = `${parsed.protocol}//${parsed.host}`;
+    } catch (e) {}
+  }
+
   const redirectUri = getGoogleRedirectUri(req);
   req.session.oauthRedirectUri = redirectUri;
 
@@ -119,7 +128,7 @@ router.get('/api/login/google', (req, res) => {
 });
 
 // --- Google OAuth Callback ---
-router.get('/api/auth/google/callback', async (req, res) => {
+router.get(['/api/auth/google/callback', '/auth/google/callback'], async (req, res) => {
   const code = req.query.code;
   const redirectUri = req.session.oauthRedirectUri;
 
@@ -169,11 +178,8 @@ router.get('/api/auth/google/callback', async (req, res) => {
     req.session.userId = user._id.toString();
 
     // Redirect back to frontend
-    if (redirectUri) {
-      const parsed = new URL(redirectUri);
-      return res.redirect(`${parsed.protocol}//${parsed.host}`);
-    }
-    res.redirect('/');
+    const frontendUrl = req.session.frontendUrl || '/';
+    res.redirect(frontendUrl);
   } catch (err) {
     console.error('Google OAuth error:', err.response?.data || err.message);
     res.status(500).send('Google OAuth authentication failed.');
@@ -427,6 +433,11 @@ router.get('/api/profile', loginRequired, async (req, res) => {
 
     res.status(200).json({
       success: true,
+      user: {
+        username: user.username,
+        email: user.email,
+        date_created: user.date_created ? user.date_created.toISOString() : null
+      },
       logs: formattedLogs
     });
   } catch (err) {
