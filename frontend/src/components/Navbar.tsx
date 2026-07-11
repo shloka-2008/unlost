@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 glass-panel border-b border-primary/10 bg-shade-5/80 backdrop-blur-lg">
+    <nav className="sticky top-0 z-50 glass-panel border-b bg-shade-5/80 backdrop-blur-lg" style={{ borderBottomColor: 'rgba(92, 50, 30, 0.12)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -46,16 +46,16 @@ const Navbar: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 ${
+                className={`relative px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center space-x-1.5 ${
                   isActive(item.href)
-                    ? 'text-primary bg-secondary/10 shadow-inner'
-                    : 'text-secondary hover:text-primary hover:bg-secondary/5'
+                    ? 'text-white'
+                    : 'text-[#6D584A] hover:text-[#3A2417] hover:bg-secondary/5'
                 }`}
               >
                 {isActive(item.href) && (
                   <motion.div
                     layoutId="activePill"
-                    className="absolute inset-0 bg-secondary/10 rounded-lg -z-10 border border-primary/5"
+                    className="absolute inset-0 bg-primary rounded-lg -z-10 shadow-sm"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -106,10 +106,10 @@ const Navbar: React.FC = () => {
                   key={item.name}
                   to={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-semibold transition-all ${
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-bold transition-all ${
                     isActive(item.href)
-                      ? 'text-primary bg-secondary/15 shadow-inner'
-                      : 'text-secondary hover:text-primary hover:bg-secondary/5'
+                      ? 'text-white bg-primary shadow-sm'
+                      : 'text-[#6D584A] hover:text-[#3A2417] hover:bg-secondary/5'
                   }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -117,7 +117,7 @@ const Navbar: React.FC = () => {
                 </Link>
               ))}
               <div className="border-t border-primary/10 my-2 pt-2 px-3 flex items-center justify-between">
-                <span className="text-sm font-semibold text-secondary">{user?.username}</span>
+                <span className="text-sm font-semibold text-[#6D584A]">{user?.username}</span>
                 <button
                   onClick={() => {
                     setIsOpen(false);

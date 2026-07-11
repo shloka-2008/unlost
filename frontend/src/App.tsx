@@ -20,10 +20,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; requireAdmin?: boole
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#0f172a]">
+      <div className="flex h-screen items-center justify-center bg-background">
         <div className="relative flex items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-500/25 border-t-indigo-500"></div>
-          <span className="absolute text-xs font-semibold text-indigo-400">UL</span>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-secondary/25 border-t-primary"></div>
+          <span className="absolute text-xs font-bold text-primary">UL</span>
         </div>
       </div>
     );
@@ -45,10 +45,10 @@ const AppContent: React.FC = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#0f172a] text-slate-100 flex flex-col relative overflow-hidden">
+      <div className="min-h-screen bg-background text-primary flex flex-col relative overflow-hidden">
         {/* Decorative background glow blobs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-pink-500/10 blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/5 blur-[120px] pointer-events-none"></div>
         
         {user && <Navbar />}
         <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">

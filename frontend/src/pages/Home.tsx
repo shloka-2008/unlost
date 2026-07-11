@@ -357,7 +357,7 @@ const AnimatedCounter: React.FC<{ value: number; suffix?: string }> = ({ value, 
 const CategoryImageFallback: React.FC<{ category: string }> = ({ category }) => {
   const cat = category.toLowerCase();
   let grad = 'from-secondary/20 to-primary/20';
-  let iconColor = 'text-primary/70';
+  let iconColor = 'text-primary';
   let Icon = Tag;
 
   if (cat.includes('elect')) {
@@ -392,9 +392,7 @@ const CategoryImageFallback: React.FC<{ category: string }> = ({ category }) => 
 
   return (
     <div className={`w-full h-full bg-gradient-to-br ${grad} flex items-center justify-center relative overflow-hidden`}>
-      {/* Background radial highlight */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(92,50,30,0.06)_0%,transparent_70%)]" />
-      {/* Drifting subtle particles inside image wrapper */}
       <div className="absolute top-4 left-6 w-2 h-2 rounded-full bg-primary/5 blur-xs" />
       <div className="absolute bottom-6 right-8 w-3.5 h-3.5 rounded-full bg-primary/5 blur-xs" />
       <Icon className={`w-14 h-14 ${iconColor} drop-shadow-[0_0_8px_rgba(92,50,30,0.15)] group-hover:scale-110 transition-transform duration-500`} />
@@ -561,10 +559,10 @@ const Home: React.FC = () => {
 
   // Statistics counters numbers
   const statsList = [
-    { title: 'Lost Items', value: 142, suffix: '', labelColor: 'text-rose-600', glow: 'rgba(220,38,38,0.1)' },
-    { title: 'Found Items', value: 285, suffix: '', labelColor: 'text-emerald-600', glow: 'rgba(5,150,105,0.1)' },
-    { title: 'Returned', value: 95, suffix: '%', labelColor: 'text-secondary', glow: 'rgba(146,99,71,0.1)' },
-    { title: 'Active Reports', value: 34, suffix: '', labelColor: 'text-amber-600', glow: 'rgba(217,119,6,0.1)' }
+    { title: 'Lost Items', value: 142, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
+    { title: 'Found Items', value: 285, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
+    { title: 'Returned', value: 95, suffix: '%', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
+    { title: 'Active Reports', value: 34, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' }
   ];
 
   // Campus building coordinates for vector map
@@ -586,7 +584,7 @@ const Home: React.FC = () => {
             initial={{ opacity: 0, y: -40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-99999 px-5 py-3 rounded-2xl bg-shade-5/90 border border-primary/30 text-primary font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-99999 px-5 py-3 rounded-2xl bg-shade-5/90 border border-primary/30 text-brand-primary font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-secondary animate-pulse" />
             <span className="text-xs sm:text-sm">{toastMessage}</span>
@@ -599,40 +597,44 @@ const Home: React.FC = () => {
       <div className="absolute bottom-20 right-20 w-[450px] h-[450px] bg-secondary/5 rounded-full blur-[160px] pointer-events-none animate-blob-2 z-0"></div>
 
       {/* ── HERO SECTION ── */}
-      <section className="relative glass-panel rounded-3xl p-8 sm:p-12 overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-10 bg-gradient-to-br from-primary via-secondary to-primary">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+      <section className="relative glass-panel rounded-3xl p-8 sm:p-12 overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-10 hero-warm-gradient">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
         
+        {/* Floating abstract accent shapes */}
+        <div className="absolute top-[20%] right-[40%] w-12 h-12 bg-accent/15 rounded-full blur-xs pointer-events-none animate-float" />
+        <div className="absolute bottom-[25%] left-[30%] w-8 h-8 bg-accent/10 rounded-full blur-xs pointer-events-none animate-float" style={{ animationDelay: '1.5s' }} />
+
         <div className="space-y-6 max-w-2xl text-center lg:text-left z-10">
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-shade-5/10 border border-shade-5/20 text-shade-5 text-xs font-semibold"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-brand-primary text-xs font-bold"
           >
             <Activity className="w-3.5 h-3.5 animate-pulse" />
-            <span>PORTAL UPDATED</span>
+            <span>PORTAL ACTIVE</span>
           </motion.div>
           
-          <h1 className="text-4xl sm:text-5xl font-black font-heading tracking-tight text-shade-5 leading-tight">
-            Lost & Found <span className="bg-gradient-to-r from-accent via-shade-5 to-accent bg-clip-text text-transparent">Portal</span>
+          <h1 className="text-4xl sm:text-5xl font-black font-heading tracking-tight text-brand-primary leading-tight">
+            Lost & Found <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Portal</span>
           </h1>
           
-          <p className="text-sm sm:text-base text-shade-5/85 font-normal leading-relaxed">
+          <p className="text-sm sm:text-base text-brand-secondary font-semibold leading-relaxed">
             Centralized intelligent hub to recover missing essentials. Browse reported catalog items, pin locations on map trackers, or list found objects with secure checks.
           </p>
 
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
             <Link
               to="/report?status=lost"
-              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-secondary to-primary hover:brightness-110 border border-white/10 shadow-lg shadow-primary/25 transition-all text-xs sm:text-sm font-bold flex items-center gap-2 text-white hover-glow"
+              className="px-6 py-3.5 rounded-2xl btn-primary-custom text-xs sm:text-sm font-bold flex items-center gap-2 hover-glow"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="w-4 h-4 text-[#E6CAAB] transition-transform duration-300 transform group-hover:scale-110" />
               <span>Report Lost Item</span>
             </Link>
             <Link
               to="/report?status=found"
-              className="px-6 py-3.5 rounded-2xl bg-shade-5/15 hover:bg-shade-5/25 border border-white/10 shadow text-xs sm:text-sm font-bold flex items-center gap-2 text-shade-5 transition-all hover-glow"
+              className="px-6 py-3.5 rounded-2xl btn-secondary-custom text-xs sm:text-sm font-bold flex items-center gap-2 hover-glow"
             >
-              <CheckCircle2 className="w-4 h-4 text-shade-5" />
+              <CheckCircle2 className="w-4 h-4 text-[#926347] transition-transform duration-300 transform group-hover:scale-110" />
               <span>Report Found Item</span>
             </Link>
           </div>
@@ -643,42 +645,42 @@ const Home: React.FC = () => {
           <div className="absolute inset-0 bg-secondary/15 rounded-full blur-3xl filter animate-pulse"></div>
           
           {/* Central Radar Ring */}
-          <div className="absolute w-44 h-44 rounded-full border border-shade-5/20 animate-ping" style={{ animationDuration: '4s' }} />
-          <div className="absolute w-28 h-28 rounded-full border border-shade-5/20 flex items-center justify-center bg-primary/80 backdrop-blur-md">
-            <Search className="w-10 h-10 text-accent animate-float" />
+          <div className="absolute w-44 h-44 rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '4s' }} />
+          <div className="absolute w-28 h-28 rounded-full border border-primary/20 flex items-center justify-center bg-[#F3E7D9]/80 backdrop-blur-md">
+            <Search className="w-10 h-10 text-primary animate-float" />
           </div>
 
           {/* Floating object SVGs / Lucide items */}
           <motion.div 
             animate={{ y: [0, -10, 0], rotate: [0, 8, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-6 left-6 p-3 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 shadow-md text-accent"
+            className="absolute top-6 left-6 p-3 rounded-2xl bg-white/60 border border-primary/10 shadow-md text-primary"
           >
-            <Key className="w-6 h-6" />
+            <Key className="w-6 h-6 transition-all duration-300 transform hover:scale-110 hover:text-accent text-primary" />
           </motion.div>
 
           <motion.div 
             animate={{ y: [0, 12, 0], rotate: [0, -6, 0] }}
             transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-            className="absolute top-10 right-6 p-3 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 shadow-md text-shade-5"
+            className="absolute top-10 right-6 p-3 rounded-2xl bg-white/60 border border-primary/10 shadow-md text-primary"
           >
-            <Wallet className="w-6 h-6" />
+            <Wallet className="w-6 h-6 transition-all duration-300 transform hover:scale-110 hover:text-accent text-primary" />
           </motion.div>
 
           <motion.div 
             animate={{ y: [0, -15, 0], rotate: [0, 12, 0] }}
             transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
-            className="absolute bottom-12 left-10 p-3 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 shadow-md text-accent"
+            className="absolute bottom-12 left-10 p-3 rounded-2xl bg-white/60 border border-primary/10 shadow-md text-primary"
           >
-            <Smartphone className="w-6 h-6" />
+            <Smartphone className="w-6 h-6 transition-all duration-300 transform hover:scale-110 hover:text-accent text-primary" />
           </motion.div>
 
           <motion.div 
             animate={{ y: [0, 8, 0], rotate: [0, -10, 0] }}
             transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 1.3 }}
-            className="absolute bottom-6 right-12 p-3 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/10 shadow-md text-shade-5"
+            className="absolute bottom-6 right-12 p-3 rounded-2xl bg-white/60 border border-primary/10 shadow-md text-primary"
           >
-            <Backpack className="w-6 h-6" />
+            <Backpack className="w-6 h-6 transition-all duration-300 transform hover:scale-110 hover:text-accent text-primary" />
           </motion.div>
         </div>
       </section>
@@ -693,17 +695,20 @@ const Home: React.FC = () => {
             transition={{ duration: 0.4, delay: idx * 0.08 }}
             className="glass-card rounded-2xl p-5 border border-primary/5 flex flex-col justify-between hover-glow"
             style={{ 
-              background: `radial-gradient(circle at 10% 10%, rgba(92,50,30,0.04) 0%, rgba(243,231,217,0.85) 100%)` 
+              background: `radial-gradient(circle at 10% 10%, rgba(92,50,30,0.02) 0%, rgba(243,231,217,0.85) 100%)` 
             }}
           >
-            <div className="text-secondary text-xs sm:text-sm font-semibold mb-2">{stat.title}</div>
+            <div className="text-secondary text-xs sm:text-sm font-bold mb-2">{stat.title}</div>
             <div className="flex items-baseline gap-1">
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
             </div>
             <div className="w-full h-1 bg-primary/10 rounded-full mt-3 overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-secondary to-accent rounded-full" 
-                style={{ width: `${Math.min(stat.value / 3, 100)}%` }}
+                className="h-full rounded-full" 
+                style={{ 
+                  width: `${Math.min(stat.value / 3, 100)}%`,
+                  background: 'linear-gradient(90deg, #5C321E, #C9A07A)'
+                }}
               />
             </div>
           </motion.div>
@@ -714,21 +719,21 @@ const Home: React.FC = () => {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-secondary animate-pulse" />
-            <h2 className="text-xl sm:text-2xl font-bold text-primary tracking-tight">Featured Found Items</h2>
+            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            <h2 className="text-xl sm:text-2xl font-bold text-brand-primary tracking-tight">Featured Found Items</h2>
           </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => scrollCarousel('left')}
-              className="p-2 rounded-xl bg-shade-5 border border-primary/10 text-secondary hover:text-primary transition-colors"
+              className="p-2 rounded-xl bg-[#F3E7D9] border border-primary/10 text-secondary hover:text-brand-primary transition-colors"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 text-primary" />
             </button>
             <button 
               onClick={() => scrollCarousel('right')}
-              className="p-2 rounded-xl bg-shade-5 border border-primary/10 text-secondary hover:text-primary transition-colors"
+              className="p-2 rounded-xl bg-[#F3E7D9] border border-primary/10 text-secondary hover:text-brand-primary transition-colors"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 text-primary" />
             </button>
           </div>
         </div>
@@ -746,15 +751,15 @@ const Home: React.FC = () => {
             >
               <div className="h-36 w-full relative">
                 <CategoryImageFallback category={item.category} />
-                <span className="absolute top-3 right-3 px-2.5 py-0.5 text-[9px] font-black tracking-wider rounded-full bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 uppercase select-none">
+                <span className="absolute top-3 right-3 px-2.5 py-0.5 text-[9px] font-black tracking-wider rounded-full bg-emerald-500/20 text-emerald-855 border border-emerald-500/30 uppercase select-none">
                   {item.status}
                 </span>
               </div>
               <div className="p-4 space-y-2">
-                <h3 className="font-extrabold text-sm text-primary line-clamp-1">{item.title}</h3>
-                <p className="text-xs text-secondary line-clamp-2">{item.description}</p>
-                <div className="flex items-center gap-1 text-[10px] text-secondary/70 pt-2 border-t border-primary/5">
-                  <MapPin className="w-3.5 h-3.5" />
+                <h3 className="font-extrabold text-sm text-brand-primary line-clamp-1">{item.title}</h3>
+                <p className="text-xs text-brand-secondary line-clamp-2">{item.description}</p>
+                <div className="flex items-center gap-1 text-[10px] text-brand-muted pt-2 border-t border-primary/5">
+                  <MapPin className="w-3.5 h-3.5 text-primary transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                   <span className="line-clamp-1">{item.location}</span>
                 </div>
               </div>
@@ -774,13 +779,13 @@ const Home: React.FC = () => {
             
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-secondary/60" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-secondary" />
               <input
                 type="text"
                 placeholder="Search by wallet, airpods, keys..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/60 border border-secondary/20 text-sm text-primary placeholder-secondary/55 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/70 border border-primary/12 text-sm text-brand-primary placeholder-[#927A69]/70 focus:outline-none focus:border-secondary focus:ring-4 focus:ring-secondary/15 transition-all"
               />
             </div>
 
@@ -793,7 +798,7 @@ const Home: React.FC = () => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full text-xs bg-white/60 border border-secondary/20 rounded-lg p-2 focus:outline-none focus:border-primary text-primary"
+                  className="w-full text-xs bg-white/70 border border-primary/12 rounded-lg p-2 focus:outline-none focus:border-secondary text-brand-primary"
                 >
                   <option value="All">All Categories</option>
                   <option value="Electronics">Electronics</option>
@@ -813,7 +818,7 @@ const Home: React.FC = () => {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="w-full text-xs bg-white/60 border border-secondary/20 rounded-lg p-2 focus:outline-none focus:border-primary text-primary"
+                  className="w-full text-xs bg-white/70 border border-primary/12 rounded-lg p-2 focus:outline-none focus:border-secondary text-brand-primary"
                 >
                   <option value="All">All Statuses</option>
                   <option value="Lost">Lost</option>
@@ -827,7 +832,7 @@ const Home: React.FC = () => {
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full text-xs bg-white/60 border border-secondary/20 rounded-lg p-2 focus:outline-none focus:border-primary text-primary"
+                  className="w-full text-xs bg-white/70 border border-primary/12 rounded-lg p-2 focus:outline-none focus:border-secondary text-brand-primary"
                 >
                   <option value="All">All Locations</option>
                   {locationOptions.map((loc, i) => (
@@ -842,7 +847,7 @@ const Home: React.FC = () => {
                 <select
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full text-xs bg-white/60 border border-secondary/20 rounded-lg p-2 focus:outline-none focus:border-primary text-primary"
+                  className="w-full text-xs bg-white/70 border border-primary/12 rounded-lg p-2 focus:outline-none focus:border-secondary text-brand-primary"
                 >
                   <option value="All">Any Time</option>
                   <option value="Today">Last 24 Hours</option>
@@ -862,7 +867,7 @@ const Home: React.FC = () => {
                   className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                     selectedCategory === cat 
                       ? 'bg-primary text-white border-primary shadow-md shadow-primary/25' 
-                      : 'bg-shade-5/60 text-secondary border-primary/10 hover:text-primary hover:bg-shade-5'
+                      : 'bg-white/60 text-secondary border-primary/10 hover:text-brand-primary hover:bg-white/80'
                   }`}
                 >
                   {cat}
@@ -875,7 +880,7 @@ const Home: React.FC = () => {
           {/* Dynamic Grid list */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-lg text-primary">Item Inventory ({filteredItems.length})</h3>
+              <h3 className="font-bold text-lg text-brand-primary">Item Inventory ({filteredItems.length})</h3>
               {filteredItems.length === 0 && (
                 <button 
                   onClick={() => {
@@ -885,7 +890,7 @@ const Home: React.FC = () => {
                     setSelectedLocation('All');
                     setSelectedDate('All');
                   }}
-                  className="text-xs font-semibold text-secondary hover:text-primary"
+                  className="text-xs font-semibold text-secondary hover:text-brand-primary"
                 >
                   Clear all filters
                 </button>
@@ -895,14 +900,14 @@ const Home: React.FC = () => {
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <div key={n} className="glass-card rounded-2xl h-80 animate-pulse bg-shade-5/20 border border-primary/5" />
+                  <div key={n} className="glass-card rounded-2xl h-80 animate-pulse bg-[#F3E7D9]/20 border border-primary/5" />
                 ))}
               </div>
             ) : filteredItems.length === 0 ? (
-              <div className="glass-panel rounded-2xl p-16 text-center text-secondary border border-dashed border-primary/10 bg-shade-5/20">
-                <AlertCircle className="w-10 h-10 text-secondary/50 mx-auto mb-3" />
+              <div className="glass-panel rounded-2xl p-16 text-center text-brand-secondary border border-dashed border-primary/10 bg-[#F3E7D9]/20">
+                <AlertCircle className="w-10 h-10 text-brand-muted/55 mx-auto mb-3" />
                 <p className="text-base font-semibold">No items match your selected filters.</p>
-                <p className="text-xs text-secondary mt-1">Try resetting parameters or search input query.</p>
+                <p className="text-xs text-brand-muted mt-1">Try resetting parameters or search input query.</p>
               </div>
             ) : (
               <motion.div 
@@ -919,10 +924,10 @@ const Home: React.FC = () => {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       onClick={() => setSelectedItemModal(item)}
-                      className="glass-card rounded-2xl flex flex-col overflow-hidden group cursor-pointer hover:border-primary/40 hover-glow"
+                      className="glass-card flex flex-col overflow-hidden group cursor-pointer hover-glow"
                     >
                       {/* Image fallbacks */}
-                      <div className="h-44 w-full bg-shade-5/30 relative overflow-hidden flex items-center justify-center border-b border-primary/5">
+                      <div className="h-44 w-full bg-[#F3E7D9]/30 relative overflow-hidden flex items-center justify-center border-b border-primary/5">
                         {item.image_file ? (
                           <img 
                             src={`/static/uploads/${item.image_file}`} 
@@ -936,8 +941,8 @@ const Home: React.FC = () => {
                         {/* Status tag badge */}
                         <span className={`absolute top-3 right-3 px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md select-none border ${
                           item.status === 'Lost' 
-                            ? 'bg-rose-500/20 text-rose-700 border-rose-500/30' 
-                            : 'bg-emerald-500/20 text-emerald-700 border-emerald-500/30'
+                            ? 'bg-rose-500/20 text-rose-800 border-rose-500/30' 
+                            : 'bg-emerald-500/20 text-emerald-800 border-emerald-500/30'
                         }`}>
                           {item.status}
                         </span>
@@ -947,14 +952,14 @@ const Home: React.FC = () => {
                           {/* Bookmark */}
                           <button
                             onClick={(e) => toggleBookmark(item.id, e)}
-                            className="p-2 rounded-xl bg-white/80 backdrop-blur-md border border-primary/10 text-secondary hover:text-primary transition-all hover:scale-110"
+                            className="p-2 rounded-xl bg-white/80 border border-primary/10 text-secondary hover:text-primary transition-all duration-300 transform hover:scale-110"
                           >
                             <Bookmark className={`w-4 h-4 ${bookmarkedIds.includes(item.id) ? 'fill-primary text-primary' : ''}`} />
                           </button>
                           {/* Share */}
                           <button
                             onClick={(e) => handleShareItem(item, e)}
-                            className="p-2 rounded-xl bg-white/80 backdrop-blur-md border border-primary/10 text-secondary hover:text-primary transition-all hover:scale-110"
+                            className="p-2 rounded-xl bg-white/80 border border-primary/10 text-secondary hover:text-primary transition-all duration-300 transform hover:scale-110"
                           >
                             <Share2 className="w-4 h-4" />
                           </button>
@@ -964,30 +969,30 @@ const Home: React.FC = () => {
                       {/* Card Content details */}
                       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                         <div className="space-y-2">
-                          <h3 className="font-extrabold text-base text-primary group-hover:text-secondary transition-colors line-clamp-1">
+                          <h3 className="font-extrabold text-base text-brand-primary group-hover:text-primary transition-colors line-clamp-1">
                             {item.title}
                           </h3>
-                          <p className="text-xs text-secondary line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-brand-secondary line-clamp-2 leading-relaxed">
                             {item.description}
                           </p>
                         </div>
 
-                        <div className="space-y-1.5 text-[11px] text-secondary/70 pt-2 border-t border-primary/5">
+                        <div className="space-y-1.5 text-[11px] text-[#927A69] pt-2 border-t border-primary/5">
                           <div className="flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5" />
+                            <MapPin className="w-3.5 h-3.5 text-primary transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                             <span>{item.location}</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" />
+                            <Calendar className="w-3.5 h-3.5 text-primary transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                             <span>{formatDate(item.date)}</span>
                           </div>
                         </div>
 
                         <button
                           onClick={() => setSelectedItemModal(item)}
-                          className="w-full py-2.5 rounded-xl bg-shade-5/50 hover:bg-primary border border-primary/10 hover:border-primary text-secondary hover:text-white transition-all text-xs font-bold flex items-center justify-center gap-1.5"
+                          className="w-full py-2.5 rounded-xl btn-secondary-custom text-xs font-bold flex items-center justify-center gap-1.5"
                         >
-                          <Eye className="w-3.5 h-3.5" />
+                          <Eye className="w-3.5 h-3.5 text-primary transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                           <span>View Details</span>
                         </button>
                       </div>
@@ -1004,17 +1009,17 @@ const Home: React.FC = () => {
         <aside className="w-full lg:w-80 space-y-8">
           
           {/* Interactive SVG Campus Map */}
-          <div className="glass-panel rounded-2xl p-5 border border-primary/10 space-y-4 bg-shade-5/20">
+          <div className="glass-panel rounded-2xl p-5 border border-primary/10 space-y-4 bg-[#F3E7D9]/20">
             <div className="flex items-center gap-2">
               <Map className="w-5 h-5 text-primary" />
-              <h4 className="font-bold text-sm text-primary">Campus Location Map</h4>
+              <h4 className="font-bold text-sm text-brand-primary">Campus Location Map</h4>
             </div>
             
             {/* Campus SVG layout Map tracker container */}
             <div className="w-full h-64 rounded-xl border border-primary/10 bg-white/40 relative overflow-hidden flex items-center justify-center">
               
               {/* Styled SVG layout map grid */}
-              <svg className="w-full h-full text-secondary/40" viewBox="0 0 400 300">
+              <svg className="w-full h-full text-secondary/45" viewBox="0 0 400 300">
                 {/* Grass / Park areas */}
                 <rect x="20" y="20" width="360" height="260" rx="14" fill="#F3E7D9" />
                 <path d="M 120 80 Q 200 130 280 80 T 360 80" fill="none" stroke="rgba(92,50,30,0.02)" strokeWidth="80" strokeLinecap="round" />
@@ -1070,9 +1075,9 @@ const Home: React.FC = () => {
                         style={{ transform: 'translate(-50%, -108%)' }}
                         className="absolute left-1.5 top-0 w-44 z-50 glass-panel rounded-xl p-3 border border-primary/20 text-xs shadow-2xl bg-shade-5/95"
                       >
-                        <div className="font-extrabold text-primary truncate">{target.title}</div>
+                        <div className="font-extrabold text-[#3A2417] truncate">{target.title}</div>
                         <div className="text-[10px] text-secondary font-semibold mb-1 truncate">{target.location}</div>
-                        <div className="text-[9px] text-secondary flex items-center justify-between">
+                        <div className="text-[9px] text-brand-muted flex items-center justify-between">
                           <span>{target.category}</span>
                           <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
                             target.status === 'Lost' ? 'bg-rose-500/10 text-rose-700' : 'bg-emerald-500/10 text-emerald-700'
@@ -1085,14 +1090,14 @@ const Home: React.FC = () => {
                 );
               })}
             </div>
-            <p className="text-[10px] text-secondary text-center">Hover over custom markers to reveal reported items details.</p>
+            <p className="text-[10px] text-brand-secondary text-center">Hover over custom markers to reveal reported items details.</p>
           </div>
 
           {/* Recent Activity Timeline panel */}
-          <div className="glass-panel rounded-2xl p-5 border border-primary/10 space-y-4 bg-shade-5/20">
+          <div className="glass-panel rounded-2xl p-5 border border-primary/10 space-y-4 bg-[#F3E7D9]/20">
             <div className="flex items-center gap-2 pb-2 border-b border-primary/10">
-              <Clock className="w-5 h-5 text-primary" />
-              <h4 className="font-bold text-sm text-primary">Recent Activity Timeline</h4>
+              <Clock className="w-5 h-5 text-primary animate-pulse" />
+              <h4 className="font-bold text-sm text-brand-primary">Recent Activity Timeline</h4>
             </div>
 
             {/* Vertical Timeline entries */}
@@ -1114,7 +1119,7 @@ const Home: React.FC = () => {
                   <div className={`absolute -left-6 top-1 w-2.5 h-2.5 rounded-full border border-shade-5 ring-2 ring-shade-5/50 ${act.dot}`} />
                   
                   <div className="font-semibold text-primary">{act.text}</div>
-                  <div className="text-[9px] text-secondary font-medium">{act.date}</div>
+                  <div className="text-[9px] text-brand-muted font-medium">{act.date}</div>
                 </div>
               ))}
 
@@ -1156,14 +1161,14 @@ const Home: React.FC = () => {
                       to={btn.path}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-110 ${btn.color}`}
                     >
-                      <btn.icon className="w-4 h-4" />
+                      <btn.icon className="w-4 h-4 transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                     </Link>
                   ) : (
                     <button
                       onClick={btn.action}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-110 ${btn.color}`}
                     >
-                      <btn.icon className="w-4 h-4" />
+                      <btn.icon className="w-4 h-4 transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                     </button>
                   )}
                 </div>
@@ -1179,7 +1184,7 @@ const Home: React.FC = () => {
             fabOpen ? 'bg-secondary rotate-45 border border-white/10' : 'bg-gradient-to-r from-primary to-secondary hover:brightness-110 hover:scale-105'
           }`}
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="w-6 h-6 animate-pulse" />
         </button>
 
       </div>
@@ -1211,7 +1216,7 @@ const Home: React.FC = () => {
                 onClick={() => setSelectedItemModal(null)}
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/40 text-secondary hover:text-primary border border-primary/10 cursor-pointer z-50"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 text-primary transition-all duration-300 transform hover:scale-110 hover:text-accent" />
               </button>
 
               {/* Graphic Category Header */}
@@ -1240,21 +1245,21 @@ const Home: React.FC = () => {
               <div className="p-6 sm:p-8 space-y-6">
                 
                 <div className="space-y-2">
-                  <h3 className="text-xl sm:text-2xl font-black text-primary tracking-tight leading-tight">{selectedItemModal.title}</h3>
+                  <h3 className="text-xl sm:text-2xl font-black text-brand-primary tracking-tight leading-tight">{selectedItemModal.title}</h3>
                   <div className="flex flex-wrap gap-2 pt-1">
-                    <span className="px-2.5 py-1 rounded-lg bg-white/60 border border-primary/5 text-[10px] font-bold text-primary">
+                    <span className="px-2.5 py-1 rounded-lg bg-white/60 border border-primary/5 text-[10px] font-bold text-[#3A2417]">
                       {selectedItemModal.category}
                     </span>
                     <span className="px-2.5 py-1 rounded-lg bg-white/60 border border-primary/5 text-[10px] font-bold text-secondary flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
+                      <MapPin className="w-3 h-3 text-primary transition-all duration-300 transform hover:scale-110 hover:text-accent" />
                       {selectedItemModal.location}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <h4 className="text-xs uppercase font-bold text-secondary tracking-wider">Item Description</h4>
-                  <p className="text-sm text-primary leading-relaxed bg-white/40 border border-primary/5 p-4 rounded-xl">
+                  <h4 className="text-xs uppercase font-bold text-brand-secondary tracking-wider">Item Description</h4>
+                  <p className="text-sm text-brand-primary leading-relaxed bg-white/40 border border-primary/5 p-4 rounded-xl">
                     {selectedItemModal.description}
                   </p>
                 </div>
@@ -1262,12 +1267,12 @@ const Home: React.FC = () => {
                 {/* Date & reporter meta row */}
                 <div className="grid grid-cols-2 gap-4 text-xs bg-white/40 p-4 rounded-xl border border-primary/5">
                   <div className="space-y-1">
-                    <span className="text-secondary font-semibold block uppercase text-[9px] tracking-wider">Reported Date</span>
-                    <span className="text-primary font-bold">{formatDate(selectedItemModal.date)}</span>
+                    <span className="text-brand-secondary font-semibold block uppercase text-[9px] tracking-wider">Reported Date</span>
+                    <span className="text-brand-primary font-bold">{formatDate(selectedItemModal.date)}</span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-secondary font-semibold block uppercase text-[9px] tracking-wider">Reporter Email</span>
-                    <span className="text-primary font-bold truncate block">{selectedItemModal.reporter_email}</span>
+                    <span className="text-brand-secondary font-semibold block uppercase text-[9px] tracking-wider">Reporter Email</span>
+                    <span className="text-brand-primary font-bold truncate block">{selectedItemModal.reporter_email}</span>
                   </div>
                 </div>
 
@@ -1275,10 +1280,10 @@ const Home: React.FC = () => {
                 {selectedItemModal.security_question && (
                   <div className="space-y-2 text-xs bg-primary/5 p-4 rounded-xl border border-primary/20">
                     <div className="font-bold text-primary flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5" />
+                      <Shield className="w-3.5 h-3.5 text-primary" />
                       <span>Security Verification Quest</span>
                     </div>
-                    <p className="text-primary/95">{selectedItemModal.security_question}</p>
+                    <p className="text-brand-primary/95">{selectedItemModal.security_question}</p>
                   </div>
                 )}
 
@@ -1289,7 +1294,7 @@ const Home: React.FC = () => {
                       setSelectedItemModal(null);
                       triggerToast('Claim request details generated. Check inbox.');
                     }}
-                    className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-extrabold text-sm hover:brightness-110 shadow-lg shadow-primary/25 transition-all text-center hover-glow"
+                    className="flex-1 py-3 rounded-2xl btn-primary-custom font-extrabold text-sm text-center hover-glow"
                   >
                     Claim & Recover Item
                   </button>

@@ -10,16 +10,8 @@ export default {
         background: '#E6CAAB',
         surface: '#F3E7D9',
         'surface-hover': '#ebd8c2',
-        primary: {
-          light: '#926347',
-          DEFAULT: '#5C321E',
-          dark: '#452212',
-        },
-        secondary: {
-          light: '#C9A07A',
-          DEFAULT: '#926347',
-          dark: '#754d33',
-        },
+        primary: '#5C321E',
+        secondary: '#926347',
         accent: '#C9A07A',
         'shade-5': '#F3E7D9',
       },
