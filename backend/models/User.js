@@ -15,11 +15,21 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: false
   },
   is_admin: {
     type: Boolean,
     default: false
+  },
+  role: {
+    type: String,
+    default: 'user'
+  },
+  profilePicture: {
+    type: String
+  },
+  lastLogin: {
+    type: Date
   },
   auth_provider: {
     type: String,

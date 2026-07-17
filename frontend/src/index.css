@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-[#3A2417] font-sans min-h-screen antialiased;
+    @apply bg-background text-text font-sans min-h-screen antialiased;
     background-image: radial-gradient(circle at 50% 0%, #F3E7D9 0%, transparent 80%);
   }
 
@@ -108,15 +108,18 @@ body {
 }
 
 .text-primary,
-.text-brand-primary {
-  color: #3A2417 !important;
+.text-brand-primary,
+.text-text {
+  color: #3B2418 !important;
 }
 .text-secondary,
-.text-brand-secondary {
-  color: #6D584A !important;
+.text-brand-secondary,
+.text-textSecondary {
+  color: #6B5B4D !important;
 }
-.text-brand-muted {
-  color: #927A69 !important;
+.text-brand-muted,
+.text-textMuted {
+  color: #8B7A6A !important;
 }
 .text-accent {
   color: #C9A07A !important;

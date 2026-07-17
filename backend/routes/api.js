@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 import User from '../models/User.js';
 import Item from '../models/Item.js';
 import Log from '../models/Log.js';
+import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 
 const router = express.Router();
 
@@ -52,137 +54,107 @@ const upload = multer({
 
 // --- Authentication Middlewares ---
 const loginRequired = (req, res, next) => {
-  if (req.session && req.session.userId) {
+  const token = req.cookies?.token;
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'jwtsecret123');
+    req.userId = decoded.id;
+    req.user = decoded;
     next();
-  } else {
-    res.status(401).json({ success: false, message: 'Unauthorized' });
+  } catch (err) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
   }
 };
 
 const adminRequired = async (req, res, next) => {
-  if (req.session && req.session.userId) {
-    try {
-      const user = await User.findById(req.session.userId);
-      if (user && user.is_admin) {
-        req.user = user;
-        next();
-      } else {
-        res.status(403).json({ success: false, message: 'Forbidden. Admin privileges required.' });
-      }
-    } catch (err) {
-      res.status(500).json({ success: false, message: 'Server error' });
+  const token = req.cookies?.token;
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'jwtsecret123');
+    if (decoded.role === 'admin' || decoded.is_admin) {
+      req.userId = decoded.id;
+      req.user = decoded;
+      next();
+    } else {
+      res.status(403).json({ success: false, message: 'Forbidden. Admin privileges required.' });
     }
-  } else {
-    res.status(401).json({ success: false, message: 'Unauthorized' });
+  } catch (err) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
   }
 };
 
-// --- Helper for Google OAuth URL construction ---
-const getGoogleRedirectUri = (req) => {
-  const configuredUri = process.env.GOOGLE_REDIRECT_URI;
-  if (configuredUri) return configuredUri;
+// --- Google OAuth / JWT Auth ---
+const client = new OAuth2Client();
 
-  const referer = req.headers.referer;
-  if (referer) {
-    try {
-      const parsed = new URL(referer);
-      if (parsed.protocol && parsed.host) {
-        return `${parsed.protocol}//${parsed.host}/api/auth/google/callback`;
-      }
-    } catch (e) {}
-  }
-  
-  const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-  return `${protocol}://${req.headers.host}/api/auth/google/callback`;
+const generateJWT = (user) => {
+  return jwt.sign(
+    { id: user._id.toString(), email: user.email, role: user.role, is_admin: user.is_admin },
+    process.env.JWT_SECRET_KEY || 'jwtsecret123',
+    { expiresIn: '7d' }
+  );
 };
 
-// --- Google OAuth Config Endpoint ---
-router.get('/api/oauth/google/config', (req, res) => {
-  res.status(200).json({
-    google_client_id_configured: !!process.env.GOOGLE_CLIENT_ID,
-    google_client_secret_configured: !!process.env.GOOGLE_CLIENT_SECRET,
-    google_redirect_uri: getGoogleRedirectUri(req)
-  });
-});
-
-// --- Google OAuth Redirect ---
-router.get('/api/login/google', (req, res) => {
-  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-    return res.status(400).send('Google OAuth is not configured. Please set credentials.');
-  }
-
-  // Save the frontend URL to redirect back to after auth completes
-  const referer = req.headers.referer;
-  if (referer) {
-    try {
-      const parsed = new URL(referer);
-      req.session.frontendUrl = `${parsed.protocol}//${parsed.host}`;
-    } catch (e) {}
-  }
-
-  const redirectUri = getGoogleRedirectUri(req);
-  req.session.oauthRedirectUri = redirectUri;
-
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20email%20profile&prompt=select_account`;
-  res.redirect(authUrl);
-});
-
-// --- Google OAuth Callback ---
-router.get(['/api/auth/google/callback', '/auth/google/callback'], async (req, res) => {
-  const code = req.query.code;
-  const redirectUri = req.session.oauthRedirectUri;
-
-  if (!code) {
-    return res.status(400).send('Missing code parameter from Google callback.');
-  }
+router.post('/api/auth/google', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ success: false, message: 'No ID token provided.' });
 
   try {
-    // Exchange Authorization Code for Tokens
-    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
-      code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code'
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
-
-    const { id_token, access_token } = tokenRes.data;
-
-    // Retrieve User Profile
-    const profileRes = await axios.get('https://openidconnect.googleapis.com/v1/userinfo', {
-      headers: { Authorization: `Bearer ${access_token}` }
-    });
-
-    const userInfo = profileRes.data;
-    const email = userInfo.email;
-    const username = userInfo.name || email.split('@')[0];
-
-    // Find or create Google User in database
+    const payload = ticket.getPayload();
+    const { sub, email, name, picture } = payload;
+    
     let user = await User.findOne({ email });
-    if (!user) {
-      // Create user with a dummy password since they are logged via OAuth
-      const dummyPassword = Math.random().toString(36).slice(-10);
-      const hashedPassword = await bcrypt.hash(dummyPassword, 10);
-      
+    if (user) {
+      // Update profile picture and lastLogin if user exists
+      if (picture && user.profilePicture !== picture) {
+        user.profilePicture = picture;
+      }
+      user.lastLogin = new Date();
+      await user.save();
+    } else {
+      const username = name || email.split('@')[0];
       user = new User({
         username,
         email,
-        password: hashedPassword,
-        is_admin: false,
         auth_provider: 'google',
-        google_id: userInfo.sub
+        google_id: sub,
+        profilePicture: picture,
+        role: 'user',
+        is_admin: false,
+        lastLogin: new Date()
       });
       await user.save();
     }
 
-    req.session.userId = user._id.toString();
+    const jwtToken = generateJWT(user);
+    res.cookie('token', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
-    // Redirect back to frontend
-    const frontendUrl = req.session.frontendUrl || '/';
-    res.redirect(frontendUrl);
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        is_admin: user.is_admin,
+        profilePicture: user.profilePicture
+      }
+    });
   } catch (err) {
-    console.error('Google OAuth error:', err.response?.data || err.message);
-    res.status(500).send('Google OAuth authentication failed.');
+    console.error('Google OAuth error:', err);
+    res.status(401).json({ success: false, message: 'Google authentication failed.' });
   }
 });
 
@@ -190,9 +162,11 @@ router.get(['/api/auth/google/callback', '/auth/google/callback'], async (req, r
 
 // GET /api/user
 router.get('/api/user', async (req, res) => {
-  if (req.session && req.session.userId) {
+  const token = req.cookies?.token;
+  if (token) {
     try {
-      const user = await User.findById(req.session.userId);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'jwtsecret123');
+      const user = await User.findById(decoded.id);
       if (user) {
         return res.status(200).json({
           authenticated: true,
@@ -200,7 +174,9 @@ router.get('/api/user', async (req, res) => {
             id: user._id.toString(),
             username: user.username,
             email: user.email,
-            is_admin: user.is_admin
+            is_admin: user.is_admin,
+            role: user.role,
+            profilePicture: user.profilePicture
           }
         });
       }
@@ -250,7 +226,15 @@ router.post('/api/login', async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user && await bcrypt.compare(password, user.password)) {
-      req.session.userId = user._id.toString();
+      const jwtToken = generateJWT(user);
+      res.cookie('token', jwtToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+      user.lastLogin = new Date();
+      await user.save();
 
       res.status(200).json({
         success: true,
@@ -258,7 +242,9 @@ router.post('/api/login', async (req, res) => {
           id: user._id.toString(),
           username: user.username,
           email: user.email,
-          is_admin: user.is_admin
+          is_admin: user.is_admin,
+          role: user.role,
+          profilePicture: user.profilePicture
         }
       });
     } else {
@@ -271,17 +257,8 @@ router.post('/api/login', async (req, res) => {
 
 // GET /api/logout
 router.get('/api/logout', (req, res) => {
-  if (req.session) {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ success: false, message: 'Could not log out' });
-      }
-      res.clearCookie('connect.sid');
-      res.status(200).json({ success: true, message: 'Logged out successfully.' });
-    });
-  } else {
-    res.status(200).json({ success: true });
-  }
+  res.clearCookie('token');
+  res.status(200).json({ success: true, message: 'Logged out successfully.' });
 });
 
 // --- Items and Claims ---
@@ -355,7 +332,7 @@ router.post('/api/report', loginRequired, upload.single('image'), async (req, re
   }
 
   try {
-    const currentUser = await User.findById(req.session.userId);
+    const currentUser = await User.findById(req.userId);
     const dateObj = date ? new Date(date) : new Date();
 
     const newItem = new Item({
@@ -419,7 +396,7 @@ router.post('/api/verify_claim', loginRequired, async (req, res) => {
 // GET /api/profile
 router.get('/api/profile', loginRequired, async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId);
+    const user = await User.findById(req.userId);
     const logs = await Log.find({
       $or: [{ user: user.email }, { admin: user.email }]
     }).sort({ timestamp: -1 }).limit(10);

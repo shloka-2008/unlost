@@ -8,6 +8,7 @@ const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigation = [
     { name: 'Home', href: '/', icon: Search },
@@ -65,17 +66,50 @@ const Navbar: React.FC = () => {
             
             <div className="h-6 w-px bg-secondary/20 mx-2"></div>
             
-            <div className="flex items-center space-x-3">
-              <span className="text-xs font-semibold text-secondary border border-primary/10 rounded-full px-3 py-1 bg-white/40">
-                {user?.username}
-              </span>
-              <button
-                onClick={logout}
-                className="p-2 rounded-lg text-secondary hover:text-rose-500 hover:bg-secondary/5 transition-all duration-200"
-                title="Log Out"
+            <div className="relative">
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center space-x-2 focus:outline-none"
               >
-                <LogOut className="h-5 w-5" />
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt="Avatar" className="h-9 w-9 rounded-full border border-primary/20 shadow-sm" />
+                ) : (
+                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
+                    <User className="h-5 w-5 text-primary" />
+                  </div>
+                )}
               </button>
+              
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-xl border border-primary/10 overflow-hidden z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-primary/5 bg-slate-50/50">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{user?.username}</p>
+                      <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                    </div>
+                    <div className="py-1">
+                      <Link to="/" onClick={() => setIsDropdownOpen(false)} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors">
+                        <Search className="mr-3 h-4 w-4 text-slate-400" /> Dashboard
+                      </Link>
+                      <Link to="/profile" onClick={() => setIsDropdownOpen(false)} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors">
+                        <User className="mr-3 h-4 w-4 text-slate-400" /> Profile
+                      </Link>
+                      <button
+                        onClick={() => { setIsDropdownOpen(false); logout(); }}
+                        className="flex w-full items-center px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
+                      >
+                        <LogOut className="mr-3 h-4 w-4 text-rose-500" /> Logout
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 

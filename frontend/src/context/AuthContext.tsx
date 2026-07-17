@@ -5,12 +5,15 @@ export interface User {
   username: string;
   email: string;
   is_admin: boolean;
+  role?: string;
+  profilePicture?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  loginWithGoogle: (token: string) => Promise<{ success: boolean; message?: string }>;
   registerUser: (username: string, email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -32,6 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           username: data.user.username,
           email: data.user.email,
           is_admin: data.user.is_admin,
+          role: data.user.role,
+          profilePicture: data.user.profilePicture,
         });
       } else {
         setUser(null);
@@ -68,6 +73,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithGoogle = async (token: string) => {
+    try {
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setUser(data.user);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || 'Google Login failed.' };
+      }
+    } catch (error) {
+      console.error('Google Login error:', error);
+      return { success: false, message: 'Server is currently unreachable.' };
+    }
+  };
+
   const registerUser = async (username: string, email: string, password: string) => {
     try {
       const response = await fetch('/api/register', {
@@ -98,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, registerUser, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, registerUser, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
