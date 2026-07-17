@@ -130,11 +130,11 @@ const Admin: React.FC = () => {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-4">
         <div>
-          <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight flex items-center gap-2">
-            <Shield className="h-8 w-8 text-indigo-400" />
+          <h1 className="text-3xl font-extrabold font-heading text-text tracking-tight flex items-center gap-2">
+            <Shield className="h-8 w-8 text-primary" />
             <span>Admin Control Panel</span>
           </h1>
-          <p className="text-sm text-slate-400">Perform systems monitoring, claim audits, and data retention overrides</p>
+          <p className="text-sm text-textSecondary">Manage system operations, view global statistics, and moderate reported items.</p>
         </div>
         <button
           onClick={fetchAdminStats}

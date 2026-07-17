@@ -102,8 +102,8 @@ const Items: React.FC = () => {
     <div className="space-y-8">
       {/* Header and overview */}
       <div>
-        <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight">Search Directory</h1>
-        <p className="text-sm text-slate-400">Search reported items and verify claims to unlock contact information</p>
+        <h1 className="text-3xl font-extrabold font-heading text-text tracking-tight">Search Directory</h1>
+        <p className="text-sm text-textSecondary">Search reported items and verify claims to unlock contact information</p>
       </div>
 
       {/* Filter and search block */}

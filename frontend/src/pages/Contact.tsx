@@ -39,8 +39,8 @@ const Contact: React.FC = () => {
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight">Contact Administration</h1>
-        <p className="text-sm text-slate-400">Reach out to office operations for claiming support or escalations</p>
+        <h1 className="text-3xl font-extrabold font-heading text-text tracking-tight">Contact Administration</h1>
+        <p className="text-sm text-textSecondary">Reach out to office operations for claiming support or escalations</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

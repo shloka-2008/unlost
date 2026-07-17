@@ -78,8 +78,8 @@ const Report: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight">Report Item</h1>
-        <p className="text-sm text-slate-400">Post details of a lost or found item to help recover it</p>
+        <h1 className="text-3xl font-extrabold font-heading text-text tracking-tight">Report Item</h1>
+        <p className="text-sm text-textSecondary">Post details of a lost or found item to help recover it</p>
       </div>
 
       <motion.div

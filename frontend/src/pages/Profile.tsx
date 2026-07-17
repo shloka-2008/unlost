@@ -57,8 +57,8 @@ const Profile: React.FC = () => {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight">Your Profile</h1>
-        <p className="text-sm text-slate-400">Manage account information and view your activity logs</p>
+        <h1 className="text-3xl font-extrabold font-heading text-text tracking-tight">Your Profile</h1>
+        <p className="text-sm text-textSecondary">Manage account information and view your activity logs</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -81,23 +81,23 @@ const Profile: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-xl font-bold font-heading text-white">{user?.username}</h3>
+            <h3 className="text-xl font-bold font-heading text-text">{user?.username}</h3>
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold select-none ${
               user?.is_admin
-                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                : 'bg-slate-800 text-slate-400 border border-white/5'
+                ? 'bg-indigo-500/20 text-indigo-700 border border-indigo-500/30'
+                : 'bg-primary/10 text-textSecondary border border-primary/20'
             }`}>
               {user?.is_admin ? 'Administrator' : 'Student Account'}
             </span>
           </div>
 
-          <div className="w-full text-left space-y-3 pt-4 border-t border-white/5 text-sm text-slate-300">
+          <div className="w-full text-left space-y-3 pt-4 border-t border-primary/10 text-sm text-textSecondary">
             <div className="flex items-center gap-2.5">
-              <Mail className="h-4.5 w-4.5 text-slate-500 flex-shrink-0" />
+              <Mail className="h-4.5 w-4.5 text-primary flex-shrink-0" />
               <span className="truncate">{user?.email}</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <Calendar className="h-4.5 w-4.5 text-slate-500 flex-shrink-0" />
+              <Calendar className="h-4.5 w-4.5 text-primary flex-shrink-0" />
               <span>Created {formatDate(profileData?.user?.date_created || null)}</span>
             </div>
           </div>
@@ -106,20 +106,20 @@ const Profile: React.FC = () => {
         {/* Activity Logs */}
         <div className="md:col-span-2 space-y-4">
           <div className="glass-panel rounded-2xl p-6 space-y-6">
-            <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-              <Activity className="h-5 w-5 text-indigo-400" />
-              <h3 className="text-lg font-bold font-heading text-white">Recent Activity</h3>
+            <div className="flex items-center gap-2 border-b border-primary/10 pb-3">
+              <Activity className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-bold font-heading text-text">Recent Activity</h3>
             </div>
 
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((n) => (
-                  <div key={n} className="h-14 rounded-xl bg-slate-800/20 animate-pulse border border-white/5"></div>
+                  <div key={n} className="h-14 rounded-xl bg-primary/5 animate-pulse border border-primary/10"></div>
                 ))}
               </div>
             ) : !profileData?.logs || profileData.logs.length === 0 ? (
-              <div className="text-center py-8 text-slate-500 text-sm">
-                <FileText className="h-10 w-10 text-slate-600 mx-auto mb-2" />
+              <div className="text-center py-8 text-textSecondary text-sm">
+                <FileText className="h-10 w-10 text-textMuted mx-auto mb-2" />
                 <p>No activity logs found under this account.</p>
               </div>
             ) : (
@@ -130,22 +130,22 @@ const Profile: React.FC = () => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 rounded-xl bg-slate-950/20 hover:bg-slate-950/40 border border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-all"
+                    className="p-4 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-all"
                   >
                     <div className="space-y-1">
-                      <p className="text-sm font-semibold text-slate-200">
+                      <p className="text-sm font-semibold text-text">
                         {log.action}
                       </p>
                       {log.item_title && (
-                        <p className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                          <FileText className="h-3 w-3 text-slate-500" />
+                        <p className="text-xs text-textSecondary font-medium flex items-center gap-1">
+                          <FileText className="h-3 w-3 text-textMuted" />
                           <span>Reference: {log.item_title}</span>
                         </p>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500 sm:text-right flex-shrink-0">
-                      <Clock className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-1.5 text-xs text-textSecondary sm:text-right flex-shrink-0">
+                      <Clock className="h-3.5 w-3.5 text-primary" />
                       <span>
                         {formatDate(log.timestamp)} at {formatTime(log.timestamp)}
                       </span>

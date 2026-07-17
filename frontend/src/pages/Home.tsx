@@ -558,21 +558,48 @@ const Home: React.FC = () => {
   }).filter(Boolean))) as string[];
 
   // Statistics counters numbers
+  const lostItemsCount = allItems.filter(i => i.status === 'Lost').length;
+  const foundItemsCount = allItems.filter(i => i.status === 'Found').length;
+  const returnedItemsCount = allItems.filter(i => i.status === 'Claimed').length;
+  const totalItems = allItems.length;
+  const returnedPercentage = totalItems > 0 ? Math.round((returnedItemsCount / totalItems) * 100) : 0;
+  
   const statsList = [
-    { title: 'Lost Items', value: 142, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
-    { title: 'Found Items', value: 285, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
-    { title: 'Returned', value: 95, suffix: '%', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
-    { title: 'Active Reports', value: 34, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' }
+    { title: 'Lost Items', value: lostItemsCount, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
+    { title: 'Found Items', value: foundItemsCount, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
+    { title: 'Returned', value: returnedPercentage, suffix: '%', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' },
+    { title: 'Active Reports', value: lostItemsCount + foundItemsCount, suffix: '', labelColor: 'text-secondary', glow: 'rgba(92,50,30,0.04)' }
   ];
 
-  // Campus building coordinates for vector map
-  const mapHotspots = [
-    { name: 'Library 2nd Floor', x: 130, y: 150, category: 'Electronics', itemRef: 'mock-2' },
-    { name: 'Student Center Cafeteria', x: 260, y: 190, category: 'Wallets', itemRef: 'mock-1' },
-    { name: 'Science Hall 302', x: 190, y: 80, category: 'Bags', itemRef: 'mock-3' },
-    { name: 'Gym Entrance', x: 70, y: 240, category: 'Documents', itemRef: 'mock-4' },
-    { name: 'Parking Lot B', x: 340, y: 100, category: 'Keys', itemRef: 'mock-5' }
-  ];
+  // Dynamic Map Hotspots based on current items
+  const getMapHotspots = () => {
+    const locations = [
+      { key: 'Library', x: 130, y: 150 },
+      { key: 'Student Center', x: 260, y: 190 },
+      { key: 'Cafeteria', x: 260, y: 190 },
+      { key: 'Science', x: 190, y: 80 },
+      { key: 'Chemistry', x: 190, y: 80 },
+      { key: 'Gym', x: 70, y: 240 },
+      { key: 'Parking', x: 340, y: 100 }
+    ];
+    
+    const hotspots: { x: number, y: number, itemRef: string }[] = [];
+    const usedItems = new Set<string>();
+    
+    for (const loc of locations) {
+      const item = allItems.find(i => 
+        i.location.toLowerCase().includes(loc.key.toLowerCase()) && 
+        !usedItems.has(i.id) &&
+        i.status !== 'Claimed'
+      );
+      if (item) {
+        hotspots.push({ x: loc.x, y: loc.y, itemRef: item.id });
+        usedItems.add(item.id);
+      }
+    }
+    return hotspots.slice(0, 5);
+  };
+  const dynamicMapHotspots = getMapHotspots();
 
   return (
     <div className="space-y-10 relative pb-16">
@@ -1045,8 +1072,8 @@ const Home: React.FC = () => {
               </svg>
 
               {/* Pulsing Hotspot pins */}
-              {mapHotspots.map((pin, index) => {
-                const target = mockItems.find(m => m.id === pin.itemRef);
+              {dynamicMapHotspots.map((pin, index) => {
+                const target = allItems.find(m => m.id === pin.itemRef);
                 const isHovered = hoveredMapPin?.id === pin.itemRef;
                 const isActive = activeMapPin?.id === pin.itemRef;
 
