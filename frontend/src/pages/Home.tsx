@@ -1046,13 +1046,13 @@ const Home: React.FC = () => {
             <div className="w-full h-64 rounded-xl border border-primary/10 bg-white/40 relative overflow-hidden flex items-center justify-center">
               
               {/* Styled SVG layout map grid */}
-              <svg className="w-full h-full text-secondary/45" viewBox="0 0 400 300">
+              <svg className="w-full h-full text-secondary/45 select-none" viewBox="0 0 400 300">
                 {/* Grass / Park areas */}
                 <rect x="20" y="20" width="360" height="260" rx="14" fill="#F3E7D9" />
                 <path d="M 120 80 Q 200 130 280 80 T 360 80" fill="none" stroke="rgba(92,50,30,0.02)" strokeWidth="80" strokeLinecap="round" />
                 
                 {/* Campus Paths / Roads */}
-                <path d="M 50 150 L 350 150 L 200 50 L 200 250" stroke="rgba(92,50,30,0.04)" strokeWidth="12" strokeLinecap="round" />
+                <path d="M 50 150 L 350 150 L 200 50 L 200 250" fill="none" stroke="rgba(92,50,30,0.04)" strokeWidth="12" strokeLinecap="round" />
                 
                 {/* Buildings landmarks */}
                 <rect x="90" y="120" width="60" height="50" rx="8" fill="rgba(92,50,30,0.05)" stroke="rgba(92,50,30,0.15)" strokeWidth="1.5" />
