@@ -631,6 +631,47 @@ const Home: React.FC = () => {
         <div className="absolute top-[20%] right-[40%] w-12 h-12 bg-accent/15 rounded-full blur-xs pointer-events-none animate-float" />
         <div className="absolute bottom-[25%] left-[30%] w-8 h-8 bg-accent/10 rounded-full blur-xs pointer-events-none animate-float" style={{ animationDelay: '1.5s' }} />
 
+        {/* Floating Lost & Found Item Particles */}
+        <motion.div
+          animate={{ y: [0, -20, 0], x: [0, 10, 0], rotate: [0, 15, -5, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[12%] left-[8%] text-primary pointer-events-none z-0"
+        >
+          <Key className="w-8 h-8" />
+        </motion.div>
+        
+        <motion.div
+          animate={{ y: [0, 25, 0], x: [0, -15, 0], rotate: [0, -20, 10, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-[18%] right-[35%] text-secondary pointer-events-none z-0"
+        >
+          <Wallet className="w-12 h-12" />
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, -30, 0], x: [0, -10, 0], rotate: [0, 25, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
+          className="absolute top-[25%] right-[10%] text-accent pointer-events-none z-0"
+        >
+          <Smartphone className="w-14 h-14" />
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, 15, 0], x: [0, 20, 0], rotate: [0, -15, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          className="absolute bottom-[25%] left-[25%] text-primary/15 pointer-events-none z-0"
+        >
+          <Watch className="w-10 h-10" />
+        </motion.div>
+        
+        <motion.div
+          animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          className="absolute top-[5%] right-[45%] text-secondary pointer-events-none z-0"
+        >
+          <Backpack className="w-16 h-16" />
+        </motion.div>
+
         <div className="space-y-6 max-w-2xl text-center lg:text-left z-10">
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
@@ -776,8 +817,16 @@ const Home: React.FC = () => {
               onClick={() => setSelectedItemModal(item)}
               className="flex-shrink-0 w-72 glass-card rounded-2xl overflow-hidden snap-start cursor-pointer hover:border-primary/40 hover-glow transition-all"
             >
-              <div className="h-36 w-full relative">
-                <CategoryImageFallback category={item.category} />
+              <div className="h-36 w-full relative overflow-hidden bg-[#F3E7D9]/30 flex items-center justify-center">
+                {item.image_file ? (
+                  <img 
+                    src={`/static/uploads/${item.image_file}`} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <CategoryImageFallback category={item.category} />
+                )}
                 <span className="absolute top-3 right-3 px-2.5 py-0.5 text-[9px] font-black tracking-wider rounded-full bg-emerald-500/20 text-emerald-855 border border-emerald-500/30 uppercase select-none">
                   {item.status}
                 </span>

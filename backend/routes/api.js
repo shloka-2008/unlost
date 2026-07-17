@@ -431,15 +431,46 @@ router.get('/api/admin/stats', adminRequired, async (req, res) => {
     const lostItems = await Item.countDocuments({ status: 'Lost' });
     const foundItems = await Item.countDocuments({ status: 'Found' });
     const archivedItems = await Item.countDocuments({ status: 'Archived' });
+    const totalUsers = await User.countDocuments({});
+
+    const recentItems = await Item.find({ status: { $ne: 'Archived' } }).sort({ date: -1 }).limit(20);
+    const trashItems = await Item.find({ status: 'Archived' }).sort({ date: -1 }).limit(20);
+    const logs = await Log.find().sort({ timestamp: -1 }).limit(20);
 
     res.status(200).json({
       success: true,
       stats: {
         total_items: totalItems,
+        total_users: totalUsers,
         lost_items: lostItems,
         found_items: foundItems,
-        archived_items: archivedItems
-      }
+        archived_items: archivedItems,
+        new_today: 0,
+        security_alerts: 0
+      },
+      recent_items: recentItems.map(i => ({
+        id: i._id.toString(),
+        title: i.title,
+        category: i.category,
+        status: i.status,
+        location: i.location,
+        date: i.date,
+        reporter_email: 'Anonymous'
+      })),
+      trash_items: trashItems.map(i => ({
+        id: i._id.toString(),
+        title: i.title,
+        previous_status: 'Unknown',
+        deleted_at: i.date,
+        days_deleted: 0
+      })),
+      logs: logs.map(l => ({
+        action: l.action,
+        item_title: l.item_title || 'N/A',
+        timestamp: l.timestamp || new Date(),
+        user: l.admin || 'System',
+        item_id: 'N/A'
+      }))
     });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to fetch admin stats.' });

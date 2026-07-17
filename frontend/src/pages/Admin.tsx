@@ -181,10 +181,10 @@ const Admin: React.FC = () => {
         {statCards.map((card) => (
           <div key={card.title} className={`glass-panel rounded-2xl p-5 border flex flex-col justify-between space-y-3 ${card.color}`}>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">{card.title}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-textSecondary">{card.title}</span>
               <card.icon className="h-5 w-5 opacity-80" />
             </div>
-            <span className="text-3xl font-extrabold text-white tracking-tight">{card.value}</span>
+            <span className="text-3xl font-extrabold text-text tracking-tight">{card.value}</span>
           </div>
         ))}
       </div>
@@ -217,16 +217,16 @@ const Admin: React.FC = () => {
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-white uppercase tracking-wider font-heading">Recent Listings</h3>
+              <h3 className="text-base font-bold text-text uppercase tracking-wider font-heading">Recent Listings</h3>
               <div className="space-y-3">
                 {data?.recent_items.slice(0, 5).map((item) => (
-                  <div key={item.id} className="p-4 rounded-xl bg-slate-950/20 border border-white/5 flex items-center justify-between gap-4">
+                  <div key={item.id} className="p-4 rounded-xl bg-surface border border-primary/10 shadow-sm flex items-center justify-between gap-4">
                     <div>
-                      <h4 className="text-sm font-bold text-slate-200">{item.title}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">{item.category} • {item.location}</p>
+                      <h4 className="text-sm font-bold text-text">{item.title}</h4>
+                      <p className="text-xs text-textSecondary mt-0.5">{item.category} • {item.location}</p>
                     </div>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                      item.status === 'Lost' ? 'bg-rose-500/10 text-rose-400' : 'bg-emerald-500/10 text-emerald-400'
+                      item.status === 'Lost' ? 'bg-rose-500/10 text-rose-700' : 'bg-emerald-500/10 text-emerald-700'
                     }`}>
                       {item.status}
                     </span>
@@ -236,16 +236,16 @@ const Admin: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-white uppercase tracking-wider font-heading">Security Audit Preview</h3>
+              <h3 className="text-base font-bold text-text uppercase tracking-wider font-heading">Security Audit Preview</h3>
               <div className="space-y-3">
                 {data?.logs.slice(0, 5).map((log, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-slate-950/20 border border-white/5 flex flex-col gap-1.5 text-xs">
-                    <div className="flex items-center justify-between text-slate-400">
+                  <div key={i} className="p-4 rounded-xl bg-surface border border-primary/10 shadow-sm flex flex-col gap-1.5 text-xs">
+                    <div className="flex items-center justify-between text-textSecondary">
                       <span className="font-semibold">{log.user}</span>
                       <span>{formatDate(log.timestamp)}</span>
                     </div>
                     <p className={`font-medium ${
-                      log.action.includes('Security Alert') ? 'text-rose-400' : 'text-slate-200'
+                      log.action.includes('Security Alert') ? 'text-rose-600' : 'text-text'
                     }`}>
                       {log.action} {log.item_title && `• ${log.item_title}`}
                     </p>
@@ -263,9 +263,9 @@ const Admin: React.FC = () => {
               {data?.recent_items.length === 0 ? (
                 <p className="text-center py-6 text-slate-500 text-sm">No items in the system.</p>
               ) : (
-                <table className="min-w-full divide-y divide-white/5 text-sm text-left">
+                <table className="min-w-full divide-y divide-primary/10 text-sm text-left">
                   <thead>
-                    <tr className="text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-white/5">
+                    <tr className="text-textSecondary font-semibold text-xs uppercase tracking-wider border-b border-primary/10">
                       <th className="py-3 px-4">Item Details</th>
                       <th className="py-3 px-4">Category</th>
                       <th className="py-3 px-4">Location</th>
@@ -274,9 +274,9 @@ const Admin: React.FC = () => {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-primary/10">
                     {data?.recent_items.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-950/20 transition-all text-slate-200">
+                      <tr key={item.id} className="hover:bg-surface/80 transition-all text-text">
                         <td className="py-3.5 px-4 font-bold max-w-[200px] truncate">{item.title}</td>
                         <td className="py-3.5 px-4">{item.category}</td>
                         <td className="py-3.5 px-4">{item.location}</td>
@@ -316,9 +316,9 @@ const Admin: React.FC = () => {
                     <span>Soft deleted items are retained here for up to 10 days before automatic permanent collection purge.</span>
                   </div>
 
-                  <table className="min-w-full divide-y divide-white/5 text-sm text-left">
+                  <table className="min-w-full divide-y divide-primary/10 text-sm text-left">
                     <thead>
-                      <tr className="text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-white/5">
+                      <tr className="text-textSecondary font-semibold text-xs uppercase tracking-wider border-b border-primary/10">
                         <th className="py-3 px-4">Item Title</th>
                         <th className="py-3 px-4">Previous Status</th>
                         <th className="py-3 px-4">Deleted On</th>
@@ -326,9 +326,9 @@ const Admin: React.FC = () => {
                         <th className="py-3 px-4 text-right">Recovery Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-primary/10">
                       {data?.trash_items.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-950/20 transition-all text-slate-200">
+                        <tr key={item.id} className="hover:bg-surface/80 transition-all text-text">
                           <td className="py-3.5 px-4 font-bold">{item.title}</td>
                           <td className="py-3.5 px-4">
                             <span className="px-2 py-0.5 bg-slate-800 text-slate-400 rounded-full text-xs">
@@ -371,18 +371,18 @@ const Admin: React.FC = () => {
               {data?.logs.length === 0 ? (
                 <p className="text-center py-6 text-slate-500 text-sm">No audit logs reported.</p>
               ) : (
-                <table className="min-w-full divide-y divide-white/5 text-sm text-left">
+                <table className="min-w-full divide-y divide-primary/10 text-sm text-left">
                   <thead>
-                    <tr className="text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-white/5">
+                    <tr className="text-textSecondary font-semibold text-xs uppercase tracking-wider border-b border-primary/10">
                       <th className="py-3 px-4">Timestamp</th>
                       <th className="py-3 px-4">Action Event</th>
                       <th className="py-3 px-4">Entity reference</th>
                       <th className="py-3 px-4">Operator</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-primary/10">
                     {data?.logs.map((log, i) => (
-                      <tr key={i} className="hover:bg-slate-950/20 transition-all text-slate-200">
+                      <tr key={i} className="hover:bg-surface/80 transition-all text-text">
                         <td className="py-3.5 px-4 font-medium flex items-center gap-1.5 text-slate-400">
                           <Calendar className="h-3.5 w-3.5" />
                           <span>{formatDate(log.timestamp)}</span>
