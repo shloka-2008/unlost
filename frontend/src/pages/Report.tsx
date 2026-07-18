@@ -113,11 +113,11 @@ const Report: React.FC = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                 <Tag className="h-3.5 w-3.5" />
                 <span>Status <span className="text-rose-500">*</span></span>
               </label>
-              <div className="grid grid-cols-2 gap-2 bg-slate-950/40 p-1.5 rounded-xl border border-slate-800">
+              <div className="grid grid-cols-2 gap-2 bg-[#5C321E]/5 p-1.5 rounded-xl border border-[#5C321E]/15">
                 {['Lost', 'Found'].map((st) => (
                   <button
                     key={st}
@@ -126,9 +126,9 @@ const Report: React.FC = () => {
                     className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
                       status === st
                         ? st === 'Lost'
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : 'text-slate-500 hover:text-slate-400'
+                          ? 'bg-[#5C321E] text-white shadow-sm'
+                          : 'bg-[#5C321E] text-white shadow-sm'
+                        : 'text-[#926347] hover:text-[#5C321E] hover:bg-[#5C321E]/5'
                     }`}
                   >
                     {st}
@@ -220,11 +220,11 @@ const Report: React.FC = () => {
 
           {/* Image Upload */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
               <ImageIcon className="h-3.5 w-3.5" />
               <span>Upload Image (Optional)</span>
             </label>
-            <div className="flex flex-col sm:flex-row items-center gap-4 bg-slate-950/20 p-4 rounded-xl border border-slate-800">
+            <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#5C321E]/5 p-4 rounded-xl border border-[#926347]/20">
               <input
                 type="file"
                 accept="image/*"
@@ -234,14 +234,14 @@ const Report: React.FC = () => {
               />
               <label
                 htmlFor="item-image-file"
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-white/5 rounded-xl cursor-pointer text-xs font-semibold text-slate-200 transition-all flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-[#5C321E] hover:bg-[#6D3D24] shadow-md shadow-[#5C321E]/20 border border-[#926347]/30 rounded-xl cursor-pointer text-xs font-semibold text-white transition-all flex items-center gap-1.5"
               >
-                <ImageIcon className="h-4 w-4 text-indigo-400" />
+                <ImageIcon className="h-4 w-4 text-white/80" />
                 <span>Choose Image</span>
               </label>
 
               {imagePreview ? (
-                <div className="relative h-20 w-20 rounded-lg overflow-hidden border border-white/10 flex-shrink-0">
+                <div className="relative h-20 w-20 rounded-lg overflow-hidden border border-[#926347]/30 flex-shrink-0">
                   <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                   <button
                     type="button"
@@ -249,13 +249,13 @@ const Report: React.FC = () => {
                       setImage(null);
                       setImagePreview(null);
                     }}
-                    className="absolute top-0.5 right-0.5 bg-rose-600 rounded-full p-0.5 text-white hover:bg-rose-500"
+                    className="absolute top-0.5 right-0.5 bg-rose-600 rounded-full p-0.5 text-white hover:bg-rose-500 shadow-sm shadow-rose-900/50"
                   >
                     <PlusCircle className="h-3 w-3 rotate-45" />
                   </button>
                 </div>
               ) : (
-                <span className="text-xs text-slate-500">No file chosen</span>
+                <span className="text-xs font-medium text-[#926347]/70">No file chosen</span>
               )}
             </div>
           </div>
@@ -301,11 +301,10 @@ const Report: React.FC = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:brightness-110 shadow-lg shadow-indigo-500/25 transition-all text-sm font-semibold flex items-center justify-center gap-2 text-white"
+            className="w-full py-3.5 rounded-xl bg-[#5C321E] hover:bg-[#6D3D24] shadow-lg shadow-[#5C321E]/25 transition-all text-sm font-semibold flex items-center justify-center gap-2 text-white"
           >
             {loading ? (
               <>
@@ -315,7 +314,7 @@ const Report: React.FC = () => {
             ) : (
               <>
                 <PlusCircle className="h-4 w-4" />
-                <span>Submit Report</span>
+                <span>Report Item</span>
               </>
             )}
           </button>

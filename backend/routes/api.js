@@ -9,7 +9,7 @@ import User from '../models/User.js';
 import Item from '../models/Item.js';
 import Log from '../models/Log.js';
 import jwt from 'jsonwebtoken';
-import { OAuth2Client } from 'google-auth-library';
+import passport from 'passport';
 
 const router = express.Router();
 
@@ -54,42 +54,32 @@ const upload = multer({
 
 // --- Authentication Middlewares ---
 const loginRequired = (req, res, next) => {
-  const token = req.cookies?.token;
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'jwtsecret123');
-    req.userId = decoded.id;
-    req.user = decoded;
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
+    }
+    req.userId = user.id;
+    req.user = user;
     next();
-  } catch (err) {
-    return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
-  }
+  })(req, res, next);
 };
 
-const adminRequired = async (req, res, next) => {
-  const token = req.cookies?.token;
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'jwtsecret123');
-    if (decoded.role === 'admin' || decoded.is_admin) {
-      req.userId = decoded.id;
-      req.user = decoded;
+const adminRequired = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
+    }
+    if (user.role === 'admin' || user.is_admin) {
+      req.userId = user.id;
+      req.user = user;
       next();
     } else {
       res.status(403).json({ success: false, message: 'Forbidden. Admin privileges required.' });
     }
-  } catch (err) {
-    return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
-  }
+  })(req, res, next);
 };
 
 // --- Google OAuth / JWT Auth ---
-const client = new OAuth2Client();
-
 const generateJWT = (user) => {
   return jwt.sign(
     { id: user._id.toString(), email: user.email, role: user.role, is_admin: user.is_admin },
@@ -98,39 +88,18 @@ const generateJWT = (user) => {
   );
 };
 
-router.post('/api/auth/google', async (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).json({ success: false, message: 'No ID token provided.' });
+router.post('/api/auth/google', (req, res, next) => {
+  if (!req.body.token && req.body.credential) {
+    // Handling standard OAuth2 library token names just in case
+    req.body.id_token = req.body.credential;
+  } else if (req.body.token) {
+    req.body.id_token = req.body.token;
+  }
 
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const { sub, email, name, picture } = payload;
-    
-    let user = await User.findOne({ email });
-    if (user) {
-      // Update profile picture and lastLogin if user exists
-      if (picture && user.profilePicture !== picture) {
-        user.profilePicture = picture;
-      }
-      user.lastLogin = new Date();
-      await user.save();
-    } else {
-      const username = name || email.split('@')[0];
-      user = new User({
-        username,
-        email,
-        auth_provider: 'google',
-        google_id: sub,
-        profilePicture: picture,
-        role: 'user',
-        is_admin: false,
-        lastLogin: new Date()
-      });
-      await user.save();
+  passport.authenticate('google-id-token', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      console.error('Google OAuth error:', err || info);
+      return res.status(401).json({ success: false, message: 'Google authentication failed.' });
     }
 
     const jwtToken = generateJWT(user);
@@ -141,7 +110,7 @@ router.post('/api/auth/google', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       user: {
         id: user._id.toString(),
@@ -152,10 +121,7 @@ router.post('/api/auth/google', async (req, res) => {
         profilePicture: user.profilePicture
       }
     });
-  } catch (err) {
-    console.error('Google OAuth error:', err);
-    res.status(401).json({ success: false, message: 'Google authentication failed.' });
-  }
+  })(req, res, next);
 });
 
 // --- Regular Local Authentication ---
@@ -217,15 +183,16 @@ router.post('/api/register', async (req, res) => {
 });
 
 // POST /api/login
-router.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ success: false, message: 'Missing email or password' });
-  }
+router.post('/api/login', (req, res, next) => {
+  passport.authenticate('local', { session: false }, async (err, user, info) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Authentication error' });
+    }
+    if (!user) {
+      return res.status(401).json({ success: false, message: info?.message || 'Bad email or password' });
+    }
 
-  try {
-    const user = await User.findOne({ email });
-    if (user && await bcrypt.compare(password, user.password)) {
+    try {
       const jwtToken = generateJWT(user);
       res.cookie('token', jwtToken, {
         httpOnly: true,
@@ -236,7 +203,7 @@ router.post('/api/login', async (req, res) => {
       user.lastLogin = new Date();
       await user.save();
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         user: {
           id: user._id.toString(),
@@ -247,12 +214,10 @@ router.post('/api/login', async (req, res) => {
           profilePicture: user.profilePicture
         }
       });
-    } else {
-      res.status(401).json({ success: false, message: 'Bad email or password' });
+    } catch (saveErr) {
+      return res.status(500).json({ success: false, message: 'Error finalizing login' });
     }
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Authentication error' });
-  }
+  })(req, res, next);
 });
 
 // GET /api/logout

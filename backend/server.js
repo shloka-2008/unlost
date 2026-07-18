@@ -7,6 +7,7 @@ import MongoStore from 'connect-mongo';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
+import passport from './passport.js';
 import apiRouter from './routes/api.js';
 
 // Resolve __dirname for ES modules
@@ -26,6 +27,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(passport.initialize());
 
 // Serve static uploads
 app.use('/static', express.static(path.join(__dirname, 'static')));
