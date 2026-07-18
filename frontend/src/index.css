@@ -58,7 +58,7 @@
   box-shadow: 0 0 18px rgba(92, 50, 30, 0.15);
 }
 .glass-input::placeholder {
-  color: #A69C8F;
+  color: rgba(146, 99, 71, 0.55);
 }
 
 /* Custom buttons */
@@ -110,31 +110,19 @@ body {
 .text-primary,
 .text-brand-primary,
 .text-text {
-  color: #78716C !important;
-}
-.text-heading {
-  color: #2B1B12 !important;
-}
-.text-label {
-  color: #57534E !important;
-}
-.text-placeholder {
-  color: #A69C8F !important;
-}
-.text-icon {
-  color: #8A6A52 !important;
+  color: #3B2418 !important;
 }
 .text-secondary,
 .text-brand-secondary,
 .text-textSecondary {
-  color: #57534E !important;
+  color: #6B5B4D !important;
 }
 .text-brand-muted,
 .text-textMuted {
-  color: #A69C8F !important;
+  color: #8B7A6A !important;
 }
 .text-accent {
-  color: #8A6A52 !important;
+  color: #C9A07A !important;
 }
 .border-primary {
   border-color: #5C321E !important;

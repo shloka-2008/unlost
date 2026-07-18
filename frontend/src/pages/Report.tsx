@@ -79,7 +79,7 @@ const Report: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-extrabold font-heading text-text tracking-tight">Report Item</h1>
-        <p className="text-sm text-textSecondary">Post details of a lost or found item to help recover it</p>
+        <p className="text-sm text-slate-500">Post details of a lost or found item to help recover it</p>
       </div>
 
       <motion.div
@@ -98,7 +98,7 @@ const Report: React.FC = () => {
           {/* Title & Status */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                 <FileText className="h-3.5 w-3.5" />
                 <span>Item Title <span className="text-rose-500">*</span></span>
               </label>
@@ -140,7 +140,7 @@ const Report: React.FC = () => {
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
               <FileText className="h-3.5 w-3.5" />
               <span>Description <span className="text-rose-500">*</span></span>
             </label>
@@ -157,7 +157,7 @@ const Report: React.FC = () => {
           {/* Category, Location, Date */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                 <Tag className="h-3.5 w-3.5" />
                 <span>Category <span className="text-rose-500">*</span></span>
               </label>
@@ -173,7 +173,7 @@ const Report: React.FC = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" />
                 <span>Location <span className="text-rose-500">*</span></span>
               </label>
@@ -188,7 +188,7 @@ const Report: React.FC = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" />
                 <span>Date <span className="text-rose-500">*</span></span>
               </label>
@@ -204,7 +204,7 @@ const Report: React.FC = () => {
 
           {/* Contact details */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
               <PlusCircle className="h-3.5 w-3.5" />
               <span>Contact Information <span className="text-rose-500">*</span></span>
             </label>
@@ -260,9 +260,8 @@ const Report: React.FC = () => {
             </div>
           </div>
 
-          {/* Security Claims Question Configurations */}
           <div className="space-y-4 pt-4 border-t border-white/5">
-            <div className="flex items-center gap-2 text-indigo-400">
+            <div className="flex items-center gap-2 text-success">
               <ShieldCheck className="h-5 w-5" />
               <h3 className="text-sm font-bold uppercase tracking-wider font-heading">Claim Lock Security (Optional)</h3>
             </div>
@@ -272,7 +271,7 @@ const Report: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                   <HelpCircle className="h-3.5 w-3.5 text-slate-500" />
                   <span>Security Question</span>
                 </label>
@@ -286,7 +285,7 @@ const Report: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <label className="text-xs font-semibold text-[#926347] uppercase tracking-wider flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-slate-500" />
                   <span>Expected Answer</span>
                 </label>

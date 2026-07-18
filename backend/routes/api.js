@@ -10,6 +10,7 @@ import Item from '../models/Item.js';
 import Log from '../models/Log.js';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
+import { GoogleGenAI } from '@google/genai';
 
 const router = express.Router();
 
@@ -355,6 +356,40 @@ router.post('/api/verify_claim', loginRequired, async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ success: false, message: 'Verification error' });
+  }
+});
+
+// POST /api/chat
+router.post('/api/chat', async (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ success: false, message: 'Message is required' });
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    
+    const recentItems = await Item.find({ status: { $ne: 'Archived' } }).sort({ date: -1 }).limit(10);
+    const itemsContext = recentItems.map(i => `- ${i.title} (${i.status}) at ${i.location}`).join('\n');
+
+    const systemPrompt = `You are Smilo, the friendly AI assistant for the UNLOST portal. 
+You help users report lost items or claim found items. Keep answers brief, friendly, and helpful. 
+Use emojis where appropriate.
+Here are the most recent items in the database for your context:
+${itemsContext}`;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: message,
+        config: {
+            systemInstruction: systemPrompt,
+        }
+    });
+
+    res.status(200).json({ success: true, text: response.text, items: recentItems.slice(0, 3) });
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to communicate with AI.' });
   }
 });
 

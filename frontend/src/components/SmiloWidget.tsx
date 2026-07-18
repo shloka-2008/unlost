@@ -525,46 +525,23 @@ const SmiloWidget: React.FC = () => {
     };
 
     const getBotResponse = async (text: string): Promise<{ text: string; items?: Item[] }> => {
-        const query = text.toLowerCase().trim();
-        
-        if (query.includes('hi') || query.includes('hello') || query.includes('hey') || query.includes('yo')) {
-            return { text: "Hello there! How can I help you navigate the UNLOST portal today? 😊" };
-        }
-        
-        if (query.includes('report') || query.includes('lost') || query.includes('found') || query.includes('submit')) {
-            return { text: "To report an item, please navigate to the [Report Page](/report) using the top navigation bar. Fill out details like the item name, location, and optional image to help others identify it." };
-        }
-        
-        if (query.includes('claim') || query.includes('recover') || query.includes('get back') || query.includes('security')) {
-            return { text: "To claim a found item, click 'View Details' on the item on the [Items Page](/items). You will be prompted to answer a security question set by the reporter. Correct answers will unlock their contact information!" };
-        }
-
-        if (query.includes('latest') || query.includes('recent') || query.includes('activity') || query.includes('show items')) {
-            try {
-                const response = await fetch('/api/items');
-                const data = await response.json();
-                if (response.ok && data.success && data.items.length > 0) {
-                    const topItems = data.items.slice(0, 3);
-                    return { 
-                        text: "Here are some of the most recently reported items on UNLOST:",
-                        items: topItems
-                    };
-                }
-            } catch (err) {
-                console.error("Error fetching items in chat:", err);
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                return { text: data.text, items: data.items };
+            } else {
+                console.error("Gemini API Error:", data.message);
+                return { text: "Sorry, my AI brain circuits are a bit scrambled right now! Please try again." };
             }
-            return { text: "I couldn't fetch the latest items right now, but you can view them on the [Items Page](/items)!" };
+        } catch (error) {
+            console.error("Network Error:", error);
+            return { text: "I'm having trouble connecting to my central servers. Please check your connection." };
         }
-        
-        if (query.includes('contact') || query.includes('admin') || query.includes('help') || query.includes('support')) {
-            return { text: "If you have issues or feedback, you can send an inquiry directly on our [Contact Page](/contact) to reach the admin team." };
-        }
-
-        if (query.includes('profile') || query.includes('my log') || query.includes('stats')) {
-            return { text: "You can view your history of reported and claimed items, along with account logs, on your [Profile Page](/profile)." };
-        }
-
-        return { text: "I'm here to help with UNLOST! Try asking:\n- 'Show latest items'\n- 'How to report an item'\n- 'How to claim/recover an item'\n- 'How does security check work?'" };
     };
 
     const handleSendMessage = async (e?: React.FormEvent) => {

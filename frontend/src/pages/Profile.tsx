@@ -69,10 +69,14 @@ const Profile: React.FC = () => {
           className="glass-panel rounded-2xl p-6 flex flex-col items-center text-center space-y-5 md:col-span-1"
         >
           {/* Avatar sphere */}
-          <div className="relative h-24 w-24 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 select-none">
-            <span className="text-3xl font-extrabold text-white uppercase font-heading">
-              {user?.username.slice(0, 2)}
-            </span>
+          <div className="relative h-24 w-24 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 select-none overflow-hidden border-2 border-white/20">
+            {user?.profilePicture ? (
+              <img src={user.profilePicture} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-3xl font-extrabold text-white uppercase font-heading">
+                {user?.username.slice(0, 2)}
+              </span>
+            )}
             {user?.is_admin && (
               <span className="absolute bottom-0 right-0 p-1.5 bg-indigo-500 rounded-full border-2 border-slate-900 shadow text-white" title="Admin Account">
                 <Shield className="h-3.5 w-3.5" />
