@@ -1,0 +1,55 @@
+<!-- Floating Action Button -->
+<button *ngIf="!isOpen" mat-fab color="primary" class="!fixed bottom-6 right-6 !w-14 !h-14 shadow-2xl z-50 animate-bounce hover:animate-none" (click)="toggleChat()">
+  <lucide-icon name="message-circle" class="w-6 h-6"></lucide-icon>
+</button>
+
+<!-- Chat Window -->
+<div *ngIf="isOpen" class="fixed bottom-6 right-6 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl z-50 flex flex-col border border-gray-200 overflow-hidden transform transition-all duration-300 origin-bottom-right" style="height: 500px; max-height: calc(100vh - 48px);">
+  
+  <!-- Header -->
+  <div class="bg-brand-600 text-white p-4 flex justify-between items-center shadow-md z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-brand-600">
+        <lucide-icon name="message-circle" class="w-5 h-5"></lucide-icon>
+      </div>
+      <div>
+        <h3 class="font-bold">UNLOST Assistant</h3>
+        <p class="text-xs text-brand-100 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-green-400"></span> Online
+        </p>
+      </div>
+    </div>
+    <button mat-icon-button (click)="toggleChat()" class="text-white hover:bg-brand-700">
+      <lucide-icon name="x" class="w-5 h-5"></lucide-icon>
+    </button>
+  </div>
+
+  <!-- Chat Messages -->
+  <div class="flex-grow p-4 overflow-y-auto bg-gray-50 flex flex-col gap-4" #chatContainer>
+    <div *ngFor="let msg of messages" class="flex flex-col" [ngClass]="{'items-end': msg.sender === 'user', 'items-start': msg.sender === 'bot'}">
+      <div class="max-w-[80%] rounded-2xl p-3 shadow-sm" [ngClass]="msg.sender === 'user' ? 'bg-brand-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none'">
+        <p class="text-sm leading-relaxed">{{ msg.text }}</p>
+      </div>
+      <span class="text-[10px] text-gray-400 mt-1 px-1">{{ msg.timestamp | date:'shortTime' }}</span>
+    </div>
+    
+    <!-- Typing Indicator -->
+    <div *ngIf="isTyping" class="flex items-start">
+      <div class="bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-tl-none p-4 shadow-sm flex gap-1">
+        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="p-3 bg-white border-t border-gray-200">
+    <form (ngSubmit)="sendMessage()" class="flex items-center gap-2">
+      <input type="text" [(ngModel)]="currentMessage" name="message" placeholder="Type your message..." class="flex-grow bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 border border-transparent focus:border-brand-500 transition-all">
+      <button mat-mini-fab color="primary" type="submit" [disabled]="!currentMessage.trim()" class="flex-shrink-0 shadow-md disabled:bg-gray-300 disabled:text-gray-500">
+        <lucide-icon name="send" class="w-4 h-4"></lucide-icon>
+      </button>
+    </form>
+  </div>
+</div>

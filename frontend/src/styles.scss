@@ -1,9 +1,10 @@
+@use '@angular/material' as mat;
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 // Custom Theming for Angular Material
-@use '@angular/material' as mat;
 
 @include mat.core();
 
@@ -11,7 +12,7 @@
 $frontend-theme: mat.define-theme((
   color: (
     theme-type: light,
-    primary: mat.$indigo-palette,
+    primary: mat.$azure-palette,
     tertiary: mat.$rose-palette,
   ),
   typography: (
@@ -41,9 +42,13 @@ body {
 
 // Global Customizations to override default Material styles to match the modern aesthetic
 .mat-mdc-card {
-  @apply shadow-sm border border-gray-200 rounded-xl !important;
+  @apply shadow-sm border border-gray-200 rounded-xl;
 }
 
 .mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
-  @apply rounded-lg !important;
+  @apply font-semibold tracking-wide rounded-lg;
+}
+
+.mat-mdc-form-field-flex {
+  @apply rounded-lg;
 }
