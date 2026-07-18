@@ -379,7 +379,7 @@ Here are the most recent items in the database for your context:
 ${itemsContext}`;
 
     const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-latest',
         contents: message,
         config: {
             systemInstruction: systemPrompt,
