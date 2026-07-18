@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://your-flask-backend-url.onrender.com/api/:path*"
+    },
+    {
+      "source": "/static/uploads/:path*",
+      "destination": "https://your-flask-backend-url.onrender.com/static/uploads/:path*"
+    },
+    {
+      "source": "/((?!api|static|assets|favicon.ico).*)*",
+      "destination": "/index.html"
+    }
+  ]
+}
