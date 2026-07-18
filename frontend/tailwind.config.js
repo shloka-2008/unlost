@@ -1,35 +1,40 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{html,ts}",
   ],
   theme: {
     extend: {
       colors: {
-        primary: "#5C321E",
-        secondary: "#926347",
-        accent: "#C9A07A",
-        background: "#E6CAAB",
-        surface: "#F3E7D9",
-        text: "#3B2418",
-        textSecondary: "#6B5B4D",
-        textMuted: "#8B7A6A",
-        success: "#4E7A52",
-        warning: "#B07A1A",
-        danger: "#B4463A",
-        border: "#D4B79A"
+        brand: {
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5', // Primary Deep Indigo
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
+        },
+        accent: {
+          50: '#fff1f2',
+          100: '#ffe4e6',
+          200: '#fecdd3',
+          300: '#fda4af',
+          400: '#fb7185',
+          500: '#f43f5e', // Accent Coral
+          600: '#e11d48',
+          700: '#be123c',
+          800: '#9f1239',
+          900: '#881337',
+          950: '#4c0519',
+        }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        heading: ['Outfit', 'sans-serif'],
-      },
-      backgroundImage: {
-        'primary-gradient': 'linear-gradient(135deg, #5C321E, #926347, #C9A07A)',
-        'radial-glow': 'radial-gradient(circle at 50% 0%, #F3E7D9 0%, transparent 70%)',
-      },
-      boxShadow: {
-        'glass': '0 8px 32px 0 rgba(92, 50, 30, 0.15)',
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       }
     },
   },
