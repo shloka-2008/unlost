@@ -46,18 +46,18 @@ const Contact: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left column: Direct info */}
         <div className="space-y-6 md:col-span-1">
-          <div className="glass-panel rounded-2xl p-6 space-y-6">
-            <h3 className="text-lg font-bold font-heading text-white border-b border-white/5 pb-2">Office Directory</h3>
+          <div className="glass-panel hero-warm-gradient rounded-2xl p-6 space-y-6">
+            <h3 className="text-lg font-bold font-heading text-brand-primary border-b border-primary/20 pb-2">Office Directory</h3>
             
             <div className="space-y-5">
               {offices.map((office) => (
                 <div key={office.title} className="flex gap-3">
-                  <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                  <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-brand-primary h-10 w-10 flex items-center justify-center flex-shrink-0">
                     <office.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">{office.title}</h4>
-                    <p className="text-sm text-slate-200 mt-0.5">{office.desc}</p>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-primary/70">{office.title}</h4>
+                    <p className="text-sm text-primary font-medium mt-0.5">{office.desc}</p>
                   </div>
                 </div>
               ))}
@@ -70,9 +70,9 @@ const Contact: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="glass-panel rounded-2xl p-6 sm:p-8 space-y-6"
+            className="glass-panel hero-warm-gradient rounded-2xl p-6 sm:p-8 space-y-6"
           >
-            <h3 className="text-lg font-bold font-heading text-white border-b border-white/5 pb-2">Send a Message</h3>
+            <h3 className="text-lg font-bold font-heading text-brand-primary border-b border-primary/20 pb-2">Send a Message</h3>
 
             <AnimatePresence>
               {submitted && (
@@ -91,7 +91,7 @@ const Contact: React.FC = () => {
             <form onSubmit={handleContactSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Your Name</label>
+                  <label className="text-xs font-semibold text-primary/70 uppercase tracking-wider">Your Name</label>
                   <input
                     type="text"
                     required
@@ -102,7 +102,7 @@ const Contact: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email Address</label>
+                  <label className="text-xs font-semibold text-primary/70 uppercase tracking-wider">Email Address</label>
                   <input
                     type="email"
                     required
@@ -115,7 +115,7 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Subject</label>
+                <label className="text-xs font-semibold text-primary/70 uppercase tracking-wider">Subject</label>
                 <input
                   type="text"
                   required
@@ -127,7 +127,7 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Message</label>
+                <label className="text-xs font-semibold text-primary/70 uppercase tracking-wider">Message</label>
                 <textarea
                   required
                   rows={5}
@@ -141,7 +141,7 @@ const Contact: React.FC = () => {
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:brightness-110 shadow-lg shadow-indigo-500/25 transition-all text-sm font-semibold flex items-center justify-center gap-2 text-white"
+                className="w-full py-3 rounded-xl btn-primary-custom hover-glow shadow-lg shadow-primary/20 transition-all text-sm font-semibold flex items-center justify-center gap-2 text-white"
               >
                 {sending ? (
                   <>

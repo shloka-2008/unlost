@@ -524,12 +524,13 @@ const SmiloWidget: React.FC = () => {
         setTimeout(() => setShowMsg(false), 4000);
     };
 
-    const getBotResponse = async (text: string): Promise<{ text: string; items?: Item[] }> => {
+    const getBotResponse = async (history: Message[], text: string): Promise<{ text: string; items?: Item[] }> => {
         try {
+            const historyPayload = history.map(m => ({ sender: m.sender, text: m.text }));
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
+                body: JSON.stringify({ message: text, history: historyPayload })
             });
             const data = await response.json();
             if (response.ok && data.success) {
@@ -552,7 +553,8 @@ const SmiloWidget: React.FC = () => {
         setInputValue('');
         
         // Add user message
-        setMessages(prev => [...prev, { sender: 'user', text: userText, timestamp: new Date() }]);
+        const newMessages = [...messages, { sender: 'user' as 'user' | 'bot', text: userText, timestamp: new Date() }];
+        setMessages(newMessages);
         
         // Audio feed, waving, change mood to thinking
         playChime('think');
@@ -564,7 +566,7 @@ const SmiloWidget: React.FC = () => {
         
         // Simulate thinking delay
         setTimeout(async () => {
-            const response = await getBotResponse(userText);
+            const response = await getBotResponse(newMessages, userText);
             setMessages(prev => [...prev, { 
                 sender: 'bot', 
                 text: response.text, 
@@ -1054,12 +1056,22 @@ const SmiloWidget: React.FC = () => {
                                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 8px #4ade80' }} />
                                 <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc', letterSpacing: '0.05em' }}>SMILO ASSISTANT</span>
                             </div>
-                            <button 
-                                onClick={() => setChatOpen(false)} 
-                                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '16px' }}
-                            >
-                                ✕
-                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <button 
+                                    onClick={() => window.location.href = '/assistant'}
+                                    style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '14px', marginRight: '12px' }}
+                                    title="Open full screen"
+                                >
+                                    ⛶
+                                </button>
+                                <button 
+                                    onClick={() => setChatOpen(false)} 
+                                    style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '16px' }}
+                                    title="Close"
+                                >
+                                    ✕
+                                </button>
+                            </div>
                         </div>
 
                         {/* Message list */}

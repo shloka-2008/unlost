@@ -11,6 +11,7 @@ import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import SmiloWidget from './components/SmiloWidget';
+import SmiloPage from './pages/SmiloPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; requireAdmin?: boolean }> = ({ 
   children, 
@@ -83,6 +84,11 @@ const AppContent: React.FC = () => {
             <Route path="/admin" element={
               <ProtectedRoute requireAdmin>
                 <Admin />
+              </ProtectedRoute>
+            } />
+            <Route path="/assistant" element={
+              <ProtectedRoute>
+                <SmiloPage />
               </ProtectedRoute>
             } />
             {/* Fallback to home */}

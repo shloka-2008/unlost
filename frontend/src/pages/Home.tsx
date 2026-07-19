@@ -611,7 +611,7 @@ const Home: React.FC = () => {
             initial={{ opacity: 0, y: -40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-99999 px-5 py-3 rounded-2xl bg-shade-5/90 border border-primary/30 text-brand-primary font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[99999] px-5 py-3 rounded-2xl bg-shade-5/90 border border-primary/30 text-brand-primary font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-secondary animate-pulse" />
             <span className="text-xs sm:text-sm">{toastMessage}</span>
@@ -1207,7 +1207,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* ── EXPANDABLE QUICK ACTIONS FAB PANEL ── */}
-      <div className="fixed bottom-6 right-6 z-9999 flex flex-col items-end gap-3">
+      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3">
         
         {/* Unfolded cluster sub-buttons */}
         <AnimatePresence>
@@ -1268,7 +1268,7 @@ const Home: React.FC = () => {
       {/* ── VIEW DETAILS GLASSMORPHISM MODAL ── */}
       <AnimatePresence>
         {selectedItemModal && (
-          <div className="fixed inset-0 z-99999 flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4">
             
             {/* Dark blur background backdrop overlay */}
             <motion.div 

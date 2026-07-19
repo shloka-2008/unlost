@@ -361,28 +361,54 @@ router.post('/api/verify_claim', loginRequired, async (req, res) => {
 
 // POST /api/chat
 router.post('/api/chat', async (req, res) => {
-  const { message } = req.body;
-  if (!message) {
-    return res.status(400).json({ success: false, message: 'Message is required' });
+  const { message, history } = req.body;
+  if (!message && !history) {
+    return res.status(400).json({ success: false, message: 'Message or history is required' });
   }
 
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
     const recentItems = await Item.find({ status: { $ne: 'Archived' } }).sort({ date: -1 }).limit(10);
-    const itemsContext = recentItems.map(i => `- ${i.title} (${i.status}) at ${i.location}`).join('\n');
+    const itemsContext = recentItems.map(i => `- ID: ${i._id}, Title: ${i.title}, Category: ${i.category}, Status: ${i.status}, Location: ${i.location}`).join('\n');
 
     const systemPrompt = `You are Smilo, the friendly AI assistant for the UNLOST portal. 
 You help users report lost items or claim found items. Keep answers brief, friendly, and helpful. 
 Use emojis where appropriate.
+If a user asks about accuracy or statistics, let them know our matching algorithms are highly precise but encourage them to search the portal for specific items.
+IMPORTANT: You MUST ONLY answer questions related to the UNLOST portal, lost & found items, or the app's features. If the user asks off-topic, useless, or irrelevant questions, politely decline to answer and steer them back to lost & found topics.
 Here are the most recent items in the database for your context:
 ${itemsContext}`;
 
+    let contents;
+    if (history && Array.isArray(history)) {
+        contents = history.map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.text }]
+        }));
+        
+        // Gemini API requires the first message in history to be from the user.
+        // If the first message is from the model (e.g., initial greeting), remove it.
+        while (contents.length > 0 && contents[0].role === 'model') {
+            contents.shift();
+        }
+        
+        // If contents is empty after filtering, just use the message
+        if (contents.length === 0 && message) {
+            contents = [{ role: 'user', parts: [{ text: message }] }];
+        } else if (contents.length === 0) {
+            contents = [{ role: 'user', parts: [{ text: "Hello" }] }];
+        }
+    } else {
+        contents = [{ role: 'user', parts: [{ text: message }] }];
+    }
+
     const response = await ai.models.generateContent({
         model: 'gemini-flash-latest',
-        contents: message,
+        contents: contents,
         config: {
             systemInstruction: systemPrompt,
+            temperature: 0.7,
         }
     });
 
